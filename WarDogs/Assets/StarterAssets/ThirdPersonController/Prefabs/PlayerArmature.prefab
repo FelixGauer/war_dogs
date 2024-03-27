@@ -1127,7 +1127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3943692900
+  GlobalObjectIdHash: 1552133373
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -1328,6 +1328,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnObjectPrefab: {fileID: 2914572269296738633, guid: 5f4e01383cae29b469debbec3dbb390d,
     type: 3}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 16
 --- !u!114 &4235740246697838358
 MonoBehaviour:
   m_ObjectHideFlags: 0
