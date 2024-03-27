@@ -155,10 +155,10 @@ namespace StarterAssets
 
         private void Update()
         {
-            if (!IsOwner)
-            {
-                return;
-            }
+            // if (!IsOwner)   -- ENABLE THIS WHEN TRYING MULTIPLAYER
+            // {
+            //     return;
+            // }
             
             _playerInput.SwitchCurrentControlScheme(Keyboard.current, Mouse.current);
             
