@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
@@ -79,4 +80,5 @@ public class PlayerMultiplayerScript : NetworkBehaviour
     {
         Debug.Log("Test Client Rpc");
     }
+    
 }
