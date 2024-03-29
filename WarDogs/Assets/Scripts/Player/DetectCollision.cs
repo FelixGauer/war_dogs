@@ -7,12 +7,12 @@ public class DetectCollision : MonoBehaviour
     public float bottomOffset;
     public float frontOffset;
     public float collisionRadius;
-    public LayerMask GroundLayer;
+    public LayerMask groundLayer;
 
     public bool CheckGround(Vector3 Direction)
     {
         Vector3 Pos = transform.position + (Direction * bottomOffset);
-        Collider[] hitColliders = Physics.OverlapSphere(Pos, collisionRadius, GroundLayer);
+        Collider[] hitColliders = Physics.OverlapSphere(Pos, collisionRadius, groundLayer);
         if (hitColliders.Length > 0)
         {
             //we are on the ground

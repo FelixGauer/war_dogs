@@ -45,19 +45,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a098cf72ed86f4d9415767689e7ce8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FollowRotSpeed: 0.5
-  FollowRotSpeedFlying: 10
-  GravityFollowSpeed: 0.1
+  followSpeed: 0.5
+  followSpeedFlying: 10
+  gravityFollowSpeed: 0.1
   target: {fileID: 0}
-  FollowTarget: {fileID: 0}
-  YPivot: {fileID: 0}
+  followTarget: {fileID: 0}
+  yAxisPiyot: {fileID: 0}
   camTransform: {fileID: 0}
-  MouseSpeed: 2
+  mouseSpeed: 2
   turnSmoothing: 0.1
   minAngle: -35
   maxAngle: 35
-  LookDirectionSpeed: 2
-  DistanceFromPlayer: 0
+  lookDirectionSpeed: 2
+  distanceFromPlayer: 0
 --- !u!1 &3823715857252379195
 GameObject:
   m_ObjectHideFlags: 0
@@ -68,7 +68,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5448191531483058282}
   m_Layer: 0
-  m_Name: Y Pivot
+  m_Name: Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
