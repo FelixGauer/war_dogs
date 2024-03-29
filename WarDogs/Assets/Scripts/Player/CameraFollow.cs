@@ -4,35 +4,35 @@ public class CameraFollow : MonoBehaviour
 {
     //public bool FollowTargetRotation;
     [Header("FollowSpeed")]
-    public float FollowRotSpeed = 0.5f;
-    public float FollowRotSpeedFlying = 10f;
-    public float GravityFollowSpeed = 0.1f;
-    private Vector3 LookDirection;
+    public float followSpeed = 0.5f;
+    public float followSpeedFlying = 10f;
+    public float gravityFollowSpeed = 0.1f;
+    private Vector3 lookDirection;
 
     public Transform target;
-    public Transform FollowTarget;
-    public Transform YPivot;
+    public Transform followTarget;
+    public Transform yAxisPiyot;
 
     private Transform pivot;
-    private Transform FollowRotationPivot;
+    private Transform followRotationPivot;
     public Transform camTransform;
-    private Camera CamUnit;
+    private Camera cam;
 
-    private Vector3 LookAtPos;
+    private Vector3 lookAtPos;
     [Header("Mouse Speeds")]
-    public float MouseSpeed = 2;
+    public float mouseSpeed = 2;
     public float turnSmoothing = 0.1f;
     public float minAngle = -35;
     public float maxAngle = 35;
-    public float LookDirectionSpeed = 2f;
+    public float lookDirectionSpeed = 2f;
 
-    public float DistanceFromPlayer;
-    private float CurrentDis;
+    public float distanceFromPlayer;
+    private float currentDistance;
 
     float smoothX;
-    float smoothXvelocity;
+    float smoothXVelocity;
     float smoothY;
-    float smoothYvelocity;
+    float smoothYVelocity;
     private float lookAngle;
     private float tiltAngle;
 
@@ -44,18 +44,18 @@ public class CameraFollow : MonoBehaviour
         transform.parent = null;
 
         pivot = camTransform.parent;
-        LookAtPos = target.position;
-        CurrentDis = DistanceFromPlayer;
+        lookAtPos = target.position;
+        currentDistance = distanceFromPlayer;
 
         tiltAngle = 10f;
 
-        LookDirection = transform.forward;
+        lookDirection = transform.forward;
 
-        CamUnit = GetComponentInChildren<Camera>();
+        cam = GetComponentInChildren<Camera>();
     }
     private void Update()
     {
-        transform.position = FollowTarget.position;
+        transform.position = followTarget.position;
     }
 
     private void FixedUpdate()
@@ -73,7 +73,7 @@ public class CameraFollow : MonoBehaviour
     {
         float h = Input.GetAxis("CamHorizontal");
         float v = Input.GetAxis("CamVertical");
-        float rotateSpeed = MouseSpeed;
+        float rotateSpeed = mouseSpeed;
 
         HandleRotation(d, v, h, rotateSpeed);
         handlePivotPosition();
@@ -81,20 +81,20 @@ public class CameraFollow : MonoBehaviour
         //look at player
         
         
-        LookAtPos = target.position;
+        lookAtPos = target.position;
 
-        Vector3 LerpDir = Vector3.Lerp(transform.up, target.up, d * FollowRotSpeed);
+        Vector3 LerpDir = Vector3.Lerp(transform.up, target.up, d * followSpeed);
         transform.rotation = Quaternion.FromToRotation(transform.up, LerpDir) * transform.rotation;
     }
 
     void handlePivotPosition()
     {
-        float targetZ = DistanceFromPlayer;
+        float targetZ = distanceFromPlayer;
 
-        CurrentDis = Mathf.Lerp(CurrentDis, targetZ, delta * 5f);
+        currentDistance = Mathf.Lerp(currentDistance, targetZ, delta * 5f);
 
         Vector3 tp = Vector3.zero;
-        tp.z = CurrentDis;
+        tp.z = currentDistance;
         camTransform.localPosition = tp;
     }
 
@@ -102,8 +102,8 @@ public class CameraFollow : MonoBehaviour
     {
         if (turnSmoothing > 0)
         {
-            smoothY = Mathf.SmoothDamp(smoothY, v, ref smoothYvelocity, turnSmoothing);
-            smoothX = Mathf.SmoothDamp(smoothX, h, ref smoothXvelocity, turnSmoothing);
+            smoothY = Mathf.SmoothDamp(smoothY, v, ref smoothYVelocity, turnSmoothing);
+            smoothX = Mathf.SmoothDamp(smoothX, h, ref smoothXVelocity, turnSmoothing);
         }
         else
         {
