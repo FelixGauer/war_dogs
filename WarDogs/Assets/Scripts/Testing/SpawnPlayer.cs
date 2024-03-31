@@ -12,10 +12,4 @@ public class SpawnPlayer : MonoBehaviour
         Transform gameobjectPosition = this.gameObject.transform; 
         Instantiate(player, gameobjectPosition);
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
