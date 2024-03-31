@@ -6,18 +6,19 @@ public class PlayerMovement : MonoBehaviour
 {
     public enum WorldState
     {
-        Grounded, //on ground
-        InAir, //in the air
+        Grounded,
+        InAir,
     }
 
     [HideInInspector]
     public WorldState States;
     private Transform Cam;
     private Transform CamY;
+    
     //public ControlsPivot AxisPivot;
     private CameraFollow CamFol;
-
     private DetectCollision Colli;
+    
     [HideInInspector]
     public Rigidbody Rigid;
 
@@ -25,25 +26,26 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Physics")]
     public Transform[] GroundChecks;
-    public float DownwardPush; //what is applied to the player when on a surface to stick to it
-    public float GravityAmt;    //how much we are pulled downwards when we are on a wall
-    public float GravityBuildSpeed; //how quickly we build our gravity speed
-    private float ActGravAmt; //the actual gravity applied to our character
+    public float DownwardPush; // Force to apply on player when on surface
+    public float GravityAmt;    //downward force
+    public float GravityBuildSpeed; //gravity acceleration
+    private float ActGravAmt; // actual grav
 
-    public LayerMask GroundLayers; //what layers the ground can be
-    public float GravityRotationSpeed = 10f; //how fast we rotate to a new gravity direction
+    public LayerMask GroundLayers;
+    public float GravityRotationSpeed = 10f; //change graity speed rotation
 
     [Header("Stats")]
-    public float Speed = 15f; //max speed for basic movement
-    public float Acceleration = 4f; //how quickly we build speed
+    public float Speed = 15f;
+    public float Acceleration = 4f;
     public float turnSpeed = 2f;
-    private Vector3 MovDirection, movepos, targetDir, GroundDir; //where to move to
+    private Vector3 MovDirection, movepos, targetDir, GroundDir;
 
     [Header("Jumps")]
     public float JumpAmt;
     private bool HasJumped;
 
-    // Start is called before the first frame update
+    public bool cursorLocked = true;
+
     void Awake()
     {
         Rigid = GetComponentInChildren<Rigidbody>();
@@ -59,11 +61,10 @@ public class PlayerMovement : MonoBehaviour
         Rigid.transform.parent = null;
     }
 
-    private void Update()   //inputs
+    private void Update() 
     {
         transform.position = Rigid.position;
 
-        //check for jumping
         if (States == WorldState.Grounded)
         {
             if (Input.GetButtonDown("Jump"))
@@ -78,10 +79,13 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
+        
+        SetCursorState(cursorLocked);
+
     }
 
     // Update is called once per frame
-    void FixedUpdate()  //world movement
+    void FixedUpdate() 
     {
         delta = Time.deltaTime;
 
@@ -91,14 +95,12 @@ public class PlayerMovement : MonoBehaviour
 
            if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0)
             {
-                //we are not moving, lerp to a walk speed
                 Spd = 0f;
             }
           
             
             MoveSelf(delta, Spd, Acceleration);
 
-            //switch to air
             bool Ground = Colli.CheckGround(-GroundDir);
 
             if (!Ground)
@@ -110,12 +112,11 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (States == WorldState.InAir)
         {        
-            if (HasJumped) //only return back to ground once jump state is over
+            if (HasJumped)
                 return;
 
             FallingCtrl(delta, Speed, Acceleration);
 
-            //check for ground
             bool Ground = Colli.CheckGround(-GroundDir);
 
             if (Ground)
@@ -126,19 +127,18 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    //transition to ground
     public void SetGrounded()
     {
-        ActGravAmt = 5f; //our gravity is returned to normal
+        ActGravAmt = 5f;
 
         States = WorldState.Grounded;
     }
-    //transition to air
+    
     void SetInAir()
     {
         States = WorldState.InAir;
     }
-    //jump up
+
     IEnumerator JumpUp(float UpwardsAmt)
     {
         HasJumped = true;
@@ -155,7 +155,7 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.3f);
         HasJumped = false;
     }     
-    //check the angle of the floor we are stood on
+    
     Vector3 FloorAngleCheck()
     {
         RaycastHit HitFront;
@@ -186,7 +186,6 @@ public class PlayerMovement : MonoBehaviour
         return HitDir.normalized;
     }
     
-    //move our character
     void MoveSelf(float d, float Speed, float Accel)
     {
         float _xMov = Input.GetAxis("Horizontal");
@@ -222,17 +221,16 @@ public class PlayerMovement : MonoBehaviour
         Vector3 SetGroundDir = FloorAngleCheck();
         GroundDir = Vector3.Lerp(GroundDir, SetGroundDir, d * GravityRotationSpeed);
 
-        //lerp mesh slower when not on ground
+        //lerp slower when not on ground
         RotateSelf(SetGroundDir, d, GravityRotationSpeed);
         RotateMesh(d, targetDir, TurnSpd);
 
-        //move character
         float Spd = Speed;
         Vector3 curVelocity = Rigid.velocity;
 
-        if (!MoveInput) //if we are not pressing a move input we move towards velocity //or are crouching
+        if (!MoveInput) 
         {
-            Spd = Speed * 0.8f; //less speed is applied to our character
+            Spd = Speed * 0.8f; 
             MovDirection = Vector3.Lerp(transform.forward, Rigid.velocity.normalized, 12f * d);
         }
         else
@@ -242,17 +240,15 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 targetVelocity = MovDirection * Spd;
 
-        //push downwards in downward direction of mesh
         targetVelocity -= SetGroundDir * DownwardPush;
 
         Vector3 dir = Vector3.Lerp(curVelocity, targetVelocity, d * Accel);
         Rigid.velocity = dir;
     }
 
-    //move once we are in air
+
     void FallingCtrl(float d, float Speed, float Accel)
     {
-        //control our direction slightly when falling
         float _xMov = Input.GetAxis("Horizontal");
         float _zMov = Input.GetAxis("Vertical");
 
@@ -278,11 +274,9 @@ public class PlayerMovement : MonoBehaviour
         Vector3 SetGroundDir = FloorAngleCheck();
         GroundDir = Vector3.Lerp(GroundDir, SetGroundDir, d * GravityRotationSpeed);
 
-        //lerp mesh slower when not on ground
         RotateSelf(GroundDir, d, GravityRotationSpeed);
         RotateMesh(d, transform.forward, turnSpeed);
 
-        //move character
         MovDirection = targetDir;
         float Spd = Speed;
         Vector3 curVelocity = Rigid.velocity;
@@ -293,22 +287,26 @@ public class PlayerMovement : MonoBehaviour
         if (ActGravAmt < GravityAmt - 0.5f)
             ActGravAmt = Mathf.Lerp(ActGravAmt, GravityAmt, GravityBuildSpeed * d);
 
-        //move either upwards or downwards with gravity
         targetVelocity -= GroundDir * ActGravAmt;
 
         Vector3 dir = Vector3.Lerp(curVelocity, targetVelocity, d * Accel);
         Rigid.velocity = dir;
     }
-    //rotate the direction we face down
+    
     void RotateSelf(Vector3 Direction, float d, float GravitySpd)
     {
         Vector3 LerpDir = Vector3.Lerp(transform.up, Direction, d * GravitySpd);
         transform.rotation = Quaternion.FromToRotation(transform.up, LerpDir) * transform.rotation;
     }
-    //rotate the direction we face forwards
+    
     void RotateMesh(float d, Vector3 LookDir, float spd)
     {
         Quaternion SlerpRot = Quaternion.LookRotation(LookDir, transform.up);
         transform.rotation = Quaternion.Slerp(transform.rotation, SlerpRot, spd * d);
+    }
+    
+    private void SetCursorState(bool newState)
+    {
+        Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
     }
 }

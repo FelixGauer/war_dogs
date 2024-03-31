@@ -11,8 +11,8 @@ public class DetectCollision : MonoBehaviour
 
     public bool CheckGround(Vector3 Direction)
     {
-        Vector3 Pos = transform.position + (Direction * bottomOffset);
-        Collider[] hitColliders = Physics.OverlapSphere(Pos, collisionRadius, groundLayer);
+        Vector3 pos = transform.position + (Direction * bottomOffset);
+        Collider[] hitColliders = Physics.OverlapSphere(pos, collisionRadius, groundLayer);
         if (hitColliders.Length > 0)
         {
             //we are on the ground
@@ -22,11 +22,11 @@ public class DetectCollision : MonoBehaviour
         return false;
     }
 
-    void OnDrawGizmosSelected()
-    {
-        // Draw a yellow sphere at the transform's position
-        Gizmos.color = Color.yellow;
-        Vector3 Pos = transform.position + (-transform.up * bottomOffset);
-        Gizmos.DrawSphere(Pos, collisionRadius);
-    }
+    // void OnDrawGizmosSelected()
+    // {
+    //     // Draw a yellow sphere at the transform's position
+    //     Gizmos.color = Color.yellow;
+    //     Vector3 Pos = transform.position + (-transform.up * bottomOffset);
+    //     Gizmos.DrawSphere(Pos, collisionRadius);
+    // }
 }
