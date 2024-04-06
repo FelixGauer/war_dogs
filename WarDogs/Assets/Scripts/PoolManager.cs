@@ -13,17 +13,24 @@ public class PoolManager : MonoBehaviour
     public GameObject bulletTrailPrefab;
     public GameObject bulletTrailContainer;
 
+    [Header("Bullet Object")]
+    public int bulletObjectAmount;
+    public List<GameObject> bulletObjectPool;
+    public GameObject bulletObjectPrefab;
+    public GameObject bulletObjectContainer;
     private void Awake()
     {
         instance = this;
         
-        bulletTrailPooling();
+        BulletTrailPooling();
+
+        BulletObjectPooling();
     }
 
 
     #region Bullet Trail Pooling
     
-    public GameObject GetPooledBullets()
+    public GameObject GetPooledBulletsTrails()
     {
         for (int i = 0; i < bulletTrainAmount; i++)
         {
@@ -40,7 +47,7 @@ public class PoolManager : MonoBehaviour
         bulletTrainAmount++;
         return tmp;
     }
-    private void bulletTrailPooling()
+    private void BulletTrailPooling()
     {
         bulletTrailPool = new List<GameObject>();
         GameObject tmp;
@@ -50,6 +57,40 @@ public class PoolManager : MonoBehaviour
             tmp.transform.SetParent(bulletTrailContainer.transform);
             tmp.SetActive(false);
             bulletTrailPool.Add(tmp);
+        }
+    }
+    #endregion
+    
+    
+    #region Bullet Object Pooling
+    
+    public GameObject GetPooledBulletObject()
+    {
+        for (int i = 0; i < bulletObjectAmount; i++)
+        {
+            if (!bulletObjectPool[i].activeInHierarchy)
+            {
+                return bulletObjectPool[i];
+            }
+        }
+
+        GameObject tmp;
+        tmp = Instantiate(bulletObjectPrefab);
+        tmp.transform.SetParent(bulletObjectContainer.transform);
+        bulletObjectPool.Add(tmp);
+        bulletObjectAmount++;
+        return tmp;
+    }
+    private void BulletObjectPooling()
+    {
+        bulletObjectPool = new List<GameObject>();
+        GameObject tmp;
+        for (int i = 0; i < bulletObjectAmount; i++)
+        {
+            tmp = Instantiate(bulletObjectPrefab);
+            tmp.transform.SetParent(bulletObjectContainer.transform);
+            tmp.SetActive(false);
+            bulletObjectPool.Add(tmp);
         }
     }
     #endregion
