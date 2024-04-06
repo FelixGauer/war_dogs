@@ -14,8 +14,8 @@ public class GunsScriptableObjects : ScriptableObject
     public int magazineSize; 
     public int bulletsPerTap;
     public bool allowButtonHold;
-    public bool useBulletTrail;
     public GameObject gunPrefab;
+    public bool bulletObject;
     
     //Trail Renderer
     public Material material;

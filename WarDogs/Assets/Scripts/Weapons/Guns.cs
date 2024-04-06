@@ -19,6 +19,8 @@ public class Guns : MonoBehaviour
     public GameObject bulletTrailGo;
     public Slider gunReloadBar;
     public float colorIntensity;
+    public float throwSpeed;
+    public Rigidbody rb;
     
     //bools 
     bool shooting, readyToShoot, reloading;
@@ -68,6 +70,8 @@ public class Guns : MonoBehaviour
             Shoot();
         }
     }
+    
+
     private void Shoot()
     {
         readyToShoot = false;
@@ -79,18 +83,27 @@ public class Guns : MonoBehaviour
         //Calculate Direction with Spread
 
         //RayCast
-        if (Physics.Raycast(fpsCam.transform.position, direction, out rayHit, gunStats.range, whatIsEnemy))
+        if (Physics.Raycast(attackPoint.transform.position, direction, out rayHit, gunStats.range, whatIsEnemy))
         {
-            Debug.Log(rayHit.collider.name);
-
-            if (rayHit.collider.CompareTag("Enemy"));
-            //TODO: Enemy AI controller and damage
+            if (rayHit.collider.CompareTag("Enemy"))
+            {
+                Debug.Log("Hit");
+                rayHit.collider.GetComponent<EnemyAi>().TakeDamage(damage);
+                
+            }
         }
 
         //TODO: ShakeCamera
 
-
-        bulletTrailGo = PoolManager.instance.GetPooledBullets();
+        if (gunStats.bulletObject)
+        {
+            Debug.Log("11");
+            bulletTrailGo = PoolManager.instance.GetPooledBulletObject();
+        }
+        else
+        {
+            bulletTrailGo = PoolManager.instance.GetPooledBulletsTrails();
+        }
         
         // Using Gradiant
          // ParticleSystem.MainModule bulletTrailParticle = bulletTrailGo.GetComponent<ParticleSystem>().main;
@@ -102,12 +115,21 @@ public class Guns : MonoBehaviour
         material.SetColor("_EmissionColor", gunStats.emissionColor * colorIntensity);
         
         
-        if (bulletTrailGo != null)
+        if (bulletTrailGo != null && !gunStats.bulletObject)
         {
             bulletTrailGo.transform.position = attackPoint.position;
             bulletTrailGo.transform.rotation = attackPoint.rotation;
             bulletTrailGo.SetActive(true);
             
+        }
+        else
+        {
+            Debug.Log("22");
+            bulletTrailGo.transform.position = attackPoint.position;
+            bulletTrailGo.transform.rotation = attackPoint.rotation;
+            rb = bulletTrailGo.GetComponent<Rigidbody>();
+            rb.velocity = attackPoint.forward * throwSpeed;
+            bulletTrailGo.SetActive(true);
         }
         
         //Graphics
@@ -144,5 +166,15 @@ public class Guns : MonoBehaviour
     {
         bulletsLeft = gunStats.magazineSize;
         reloading = false;
+    }
+    
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.black;
+        // Draw the raycast gizmo
+        Gizmos.color = Color.red; // Set color for gizmo
+        Vector3 startPos = fpsCam.transform.position; // Start position of the raycast
+        Vector3 direction = fpsCam.transform.forward; // Direction of the raycast
+        Gizmos.DrawLine(startPos, startPos + direction * gunStats.range); // Draw the raycast as a line
     }
 }

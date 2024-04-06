@@ -16,12 +16,13 @@ MonoBehaviour:
   fireRate: 0.2
   spread: 0
   range: 100
-  reloadTime: 5
+  reloadTime: 2
   timeBetweenShots: 0.1
   magazineSize: 50
   bulletsPerTap: 1
   allowButtonHold: 1
   useBulletTrail: 0
+  gunPrefab: {fileID: 0}
   material: {fileID: 2100000, guid: d565eb01e0d91d74bad1138c2d235fe3, type: 2}
   animationCurve:
     serializedVersion: 2
@@ -30,4 +31,4 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   duration: 0
-  emissionColor: {r: 0, g: 0.008755684, b: 1, a: 1}
+  emissionColor: {r: 1, g: 0, b: 0.69697, a: 1}
