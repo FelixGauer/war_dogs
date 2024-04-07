@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 72639759}
   - component: {fileID: 72639758}
   - component: {fileID: 72639757}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: InRoomCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -514,7 +514,7 @@ GameObject:
   - component: {fileID: 604162138}
   - component: {fileID: 604162137}
   - component: {fileID: 604162136}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -668,7 +668,7 @@ GameObject:
   - component: {fileID: 916872627}
   - component: {fileID: 916872626}
   - component: {fileID: 916872625}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -774,7 +774,7 @@ GameObject:
   - component: {fileID: 919336421}
   - component: {fileID: 919336420}
   - component: {fileID: 919336419}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -924,7 +924,7 @@ GameObject:
   - component: {fileID: 1248657325}
   - component: {fileID: 1248657324}
   - component: {fileID: 1248657323}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1075,6 +1075,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4400242559412632970, guid: b11db777475e4f84da1838d4eb6dbbbe,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3412236356
+      objectReference: {fileID: 0}
     - target: {fileID: 5527745354976438971, guid: b11db777475e4f84da1838d4eb6dbbbe,
         type: 3}
       propertyPath: m_Name
@@ -1097,7 +1102,7 @@ GameObject:
   - component: {fileID: 1685613905}
   - component: {fileID: 1685613904}
   - component: {fileID: 1685613903}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1202,7 +1207,7 @@ GameObject:
   - component: {fileID: 1842995632}
   - component: {fileID: 1842995631}
   - component: {fileID: 1842995630}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
