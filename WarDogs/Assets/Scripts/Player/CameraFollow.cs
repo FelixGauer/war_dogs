@@ -26,7 +26,7 @@ public class CameraFollow : MonoBehaviour
     public float maxAngle = 35;
     public float lookDirectionSpeed = 2f;
 
-    public float distanceFromPlayer;
+    public Vector3 distanceFromPlayer = new Vector3(0f, 0f, 0.5f);
     private float currentDistance;
 
     float smoothX;
@@ -45,7 +45,7 @@ public class CameraFollow : MonoBehaviour
 
         pivot = camTransform.parent;
         lookAtPos = target.position;
-        currentDistance = distanceFromPlayer;
+        // currentDistance = distanceFromPlayer;
 
         tiltAngle = 10f;
 
@@ -89,13 +89,8 @@ public class CameraFollow : MonoBehaviour
 
     void handlePivotPosition()
     {
-        float targetZ = distanceFromPlayer;
-
-        currentDistance = Mathf.Lerp(currentDistance, targetZ, delta * 5f);
-
-        Vector3 tp = Vector3.zero;
-        tp.z = currentDistance;
-        camTransform.localPosition = tp;
+        Vector3 targetPosition = target.position + target.TransformDirection(distanceFromPlayer);
+        camTransform.position = Vector3.Lerp(camTransform.position, targetPosition, delta * 5f);
     }
 
     void HandleRotation(float d, float v, float h, float speed)

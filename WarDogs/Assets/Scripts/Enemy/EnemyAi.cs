@@ -43,7 +43,11 @@ public class EnemyAi : MonoBehaviour
     {
         //Check sight and range
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
-        playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
+
+        if (playerInSightRange)
+        {
+            playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
+        }
 
         if (!playerInSightRange && !playerInAttackRange)
         {
@@ -140,5 +144,14 @@ public class EnemyAi : MonoBehaviour
     {
         Debug.Log("Dead");
         Destroy(this.gameObject);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = Color.black;
+        Gizmos.DrawWireSphere(transform.position, sightRange);
     }
 }
