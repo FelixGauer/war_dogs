@@ -16,6 +16,7 @@ public class GunsScriptableObjects : ScriptableObject
     public bool allowButtonHold;
     public GameObject gunPrefab;
     public bool bulletObject;
+    public float recoil;
     
     //Trail Renderer
     public Material material;

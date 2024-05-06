@@ -22,6 +22,14 @@ public class Guns : MonoBehaviour
     public float throwSpeed;
     public Rigidbody rb;
     
+    //Recoil
+    [Range(0, 7f)] public float recoilAmountY;
+    [Range(0, 3f)] public float recoilAmountX;
+    [Range(0, 10f)] public float maxRecoilTime;
+    public float currentRecoilXPos;
+    public float currenRecoilYPos;
+    private float timePressed;
+    
     //bools 
     bool shooting, readyToShoot, reloading;
 
