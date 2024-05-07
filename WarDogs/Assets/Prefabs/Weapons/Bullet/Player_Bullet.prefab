@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5805565315399354046}
   - component: {fileID: 8467784755097571014}
   m_Layer: 0
-  m_Name: FlintLock_Bullet
+  m_Name: Player_Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

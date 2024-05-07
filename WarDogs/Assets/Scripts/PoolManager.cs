@@ -18,6 +18,13 @@ public class PoolManager : MonoBehaviour
     public List<GameObject> bulletObjectPool;
     public GameObject bulletObjectPrefab;
     public GameObject bulletObjectContainer;
+    
+    [Header("Enemy Bullet Object")]
+    public int enemyBulletObjectAmount;
+    public List<GameObject> enemyBulletObjectPool;
+    public GameObject enemyBulletObjectPrefab;
+    public GameObject enemyBulletObjectContainer;
+    
     private void Awake()
     {
         instance = this;
@@ -25,6 +32,8 @@ public class PoolManager : MonoBehaviour
         BulletTrailPooling();
 
         BulletObjectPooling();
+        
+        EnemyBulletObjectPooling();
     }
 
 
@@ -91,6 +100,39 @@ public class PoolManager : MonoBehaviour
             tmp.transform.SetParent(bulletObjectContainer.transform);
             tmp.SetActive(false);
             bulletObjectPool.Add(tmp);
+        }
+    }
+    #endregion
+    
+    #region Enemy Bullet Object Pooling
+    
+    public GameObject GetPooledEnemyBulletObject()
+    {
+        for (int i = 0; i < enemyBulletObjectAmount; i++)
+        {
+            if (!enemyBulletObjectPool[i].activeInHierarchy)
+            {
+                return enemyBulletObjectPool[i];
+            }
+        }
+
+        GameObject tmp;
+        tmp = Instantiate(enemyBulletObjectPrefab);
+        tmp.transform.SetParent(enemyBulletObjectContainer.transform);
+        enemyBulletObjectPool.Add(tmp);
+        enemyBulletObjectAmount++;
+        return tmp;
+    }
+    private void EnemyBulletObjectPooling()
+    {
+        enemyBulletObjectPool = new List<GameObject>();
+        GameObject tmp;
+        for (int i = 0; i < enemyBulletObjectAmount; i++)
+        {
+            tmp = Instantiate(enemyBulletObjectPrefab);
+            tmp.transform.SetParent(enemyBulletObjectContainer.transform);
+            tmp.SetActive(false);
+            enemyBulletObjectPool.Add(tmp);
         }
     }
     #endregion

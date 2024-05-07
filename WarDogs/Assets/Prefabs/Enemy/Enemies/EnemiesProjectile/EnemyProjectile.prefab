@@ -13,8 +13,9 @@ GameObject:
   - component: {fileID: 3795454323117636464}
   - component: {fileID: 7952486761721371779}
   - component: {fileID: 1522502205587484564}
+  - component: {fileID: -2299433895374175896}
   m_Layer: 0
-  m_Name: AlienProjectile
+  m_Name: EnemyProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.675677, y: -9.927042, z: -25.828924}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -133,3 +134,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-2299433895374175896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4074496659085174914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4695eba99d1637642be24ef7137ec2f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivateTimer: 3

@@ -10,26 +10,22 @@ public class EnemyAi : MonoBehaviour
     //Increase speed of some enemies on chse state using navmesh agent component 
     
     public NavMeshAgent agent;
+    public EnemyAIScriptableObject enemyType;
+    
     public Transform player;
     public LayerMask whatIsGround;
     public LayerMask whatIsPlayer;
-    public float health;
+    public GameObject enemyBulletGo;
     
     [Header("Patrol")]
     public Vector3 walkPoint;
     private bool walkPointSet;
-    public float walkPointRange;
-    public GameObject EnemyBullet;
+    
     
     [Header("Attack")]
-    public float timeBetweenAttacks;
     private bool alreadyAttacked;
-    public float throwSpeed;
     
     [Header("About States")]
-    public float sightRange;
-    public float attackRange;
-    public float increaseSightOnGettingAttacked;
     public bool playerInSightRange;
     public bool playerInAttackRange;
 
@@ -37,16 +33,17 @@ public class EnemyAi : MonoBehaviour
     {
         player = GameObject.Find("Player").transform; //for multiplayer do randome.range and maybe use tag
         agent = GetComponent<NavMeshAgent>();
+        agent.speed = enemyType.speed;
     }
 
     private void Update()
     {
         //Check sight and range
-        playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
+        playerInSightRange = Physics.CheckSphere(transform.position, enemyType.sightRange, whatIsPlayer);
 
         if (playerInSightRange)
         {
-            playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
+            playerInAttackRange = Physics.CheckSphere(transform.position, enemyType.attackRange, whatIsPlayer);
         }
 
         if (!playerInSightRange && !playerInAttackRange)
@@ -89,8 +86,8 @@ public class EnemyAi : MonoBehaviour
 
     private void SearchWalkPoint()
     {
-        float randomZ = Random.Range(-walkPointRange, walkPointRange);
-        float randomX = Random.Range(-walkPointRange, walkPointRange);
+        float randomZ = Random.Range(-enemyType.walkPointRange, enemyType.walkPointRange);
+        float randomX = Random.Range(-enemyType.walkPointRange, enemyType.walkPointRange);
 
         walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
 
@@ -114,12 +111,21 @@ public class EnemyAi : MonoBehaviour
         {
             // AttackCode
             Debug.Log("ATTACKED");
-            Rigidbody rb = Instantiate(EnemyBullet, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
-            rb.AddForce(transform.forward * throwSpeed, ForceMode.Impulse);
+            
+            enemyBulletGo = PoolManager.instance.GetPooledEnemyBulletObject();
+            if (enemyBulletGo != null)
+            {
+                enemyBulletGo.transform.position = this.transform.position;
+                enemyBulletGo.transform.rotation = this.transform.rotation;
+                enemyBulletGo.SetActive(true);
+            }
+
+            Rigidbody rb = enemyBulletGo.GetComponent<Rigidbody>();
+            rb.AddForce(transform.forward * enemyType.throwSpeed, ForceMode.Impulse);
             rb.AddForce(transform.up * 8f, ForceMode.Impulse);
             
             alreadyAttacked = true;
-            Invoke(nameof(ResetAttack), timeBetweenAttacks);
+            Invoke(nameof(ResetAttack), enemyType.timeBetweenAttacks);
         }
     }
 
@@ -130,11 +136,11 @@ public class EnemyAi : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        sightRange = sightRange + increaseSightOnGettingAttacked; //Maybe keep it maybe not
+        enemyType.sightRange = enemyType.sightRange + enemyType.increaseSightOnGettingAttacked; //Maybe keep it maybe not
         
-        health -= damage;
+        enemyType.health -= damage;
 
-        if (health <= 0)
+        if (enemyType.health <= 0)
         {
              Invoke(nameof(DestroyEnemy), 0.5f);
         }
@@ -149,9 +155,9 @@ public class EnemyAi : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.DrawWireSphere(transform.position, enemyType.attackRange);
 
         Gizmos.color = Color.black;
-        Gizmos.DrawWireSphere(transform.position, sightRange);
+        Gizmos.DrawWireSphere(transform.position, enemyType.sightRange);
     }
 }
