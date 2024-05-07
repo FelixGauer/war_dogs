@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1401839599183363187}
   - component: {fileID: 1435545599346148508}
   m_Layer: 8
-  m_Name: Assault_Robot
+  m_Name: GroundEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
