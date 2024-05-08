@@ -10,7 +10,6 @@ public class Guns : MonoBehaviour
     public GunsScriptableObjects gunStats;
     
     //Gun stats
-    public int damage;
     int bulletsLeft, bulletsShot;
     public Transform gunTransform;
     private Vector3 direction;
@@ -96,7 +95,7 @@ public class Guns : MonoBehaviour
             if (rayHit.collider.CompareTag("Enemy"))
             {
                 Debug.Log("Hit");
-                rayHit.collider.GetComponent<EnemyAi>().TakeDamage(damage);
+                rayHit.collider.GetComponent<EnemyAi>().TakeDamage(gunStats.damage);
                 
             }
         }
