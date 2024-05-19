@@ -42,15 +42,22 @@ public class Guns : MonoBehaviour
     public GameObject bulletHoleGraphic;
     public float camShakeMagnitude, camShakeDuration;
 
+    public Animator playerAnim;
+
     private void Awake()
     {
+        playerAnim = GetComponentInParent<Animator>();
+        
         bulletsLeft = gunStats.magazineSize;
         readyToShoot = true;
     }
     private void Update()
     {
+        Aiming();
         MyInput();
         
+        //change this to gun
+        // direction = fpsCam.transform.forward + new Vector3(x, y, 0);
         direction = fpsCam.transform.forward + new Vector3(x, y, 0);
 
         Quaternion rotation = Quaternion.LookRotation(direction);
@@ -78,7 +85,6 @@ public class Guns : MonoBehaviour
         }
     }
     
-
     private void Shoot()
     {
         readyToShoot = false;
@@ -173,6 +179,19 @@ public class Guns : MonoBehaviour
     {
         bulletsLeft = gunStats.magazineSize;
         reloading = false;
+    }
+
+    private void Aiming()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            playerAnim.SetBool("Aiming", true);
+        }
+        
+        if(Input.GetKeyDown(KeyCode.U))
+        {
+            playerAnim.SetBool("Aiming", false);
+        }
     }
     
     private void OnDrawGizmosSelected()

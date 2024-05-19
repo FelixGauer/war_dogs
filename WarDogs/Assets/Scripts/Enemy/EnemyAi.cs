@@ -19,7 +19,8 @@ public class EnemyAi : MonoBehaviour
     
     [Header("Patrol")]
     public Vector3 walkPoint;
-    private bool walkPointSet;
+    public bool walkPointSet;
+    public Vector3 tempWalkPoint;
     
     
     [Header("Attack")]
@@ -31,9 +32,11 @@ public class EnemyAi : MonoBehaviour
 
     private void Awake()
     {
-        player = GameObject.Find("Player").transform; //for multiplayer do randome.range and maybe use tag
+        // player = GameObject.Find("Player").transform; //for multiplayer do randome.range and maybe use tag
+        player = GameObject.FindGameObjectWithTag("Player").transform;
         agent = GetComponent<NavMeshAgent>();
         agent.speed = enemyType.speed;
+        SearchWalkPoint();
     }
 
     private void Update()
@@ -54,6 +57,7 @@ public class EnemyAi : MonoBehaviour
         if (playerInSightRange && !playerInAttackRange)
         {
             ChasePlayer();
+            tempWalkPoint = player.position;
         }
 
         if (playerInAttackRange && playerInSightRange)
@@ -65,7 +69,7 @@ public class EnemyAi : MonoBehaviour
     private void Patrolling()
     {
         // sightRange = sightRange - increaseSightOnGettingAttacked;
-        if (!walkPointSet)
+        if (!walkPointSet || tempWalkPoint == this.transform.position)
         {
             SearchWalkPoint();
         }
@@ -78,7 +82,7 @@ public class EnemyAi : MonoBehaviour
         Vector3 distanceToWalkPoint = transform.position - walkPoint;
         
         //Walkpoint Reached
-        if (distanceToWalkPoint.magnitude < 1f)
+        if (distanceToWalkPoint.magnitude < 2f)
         {
             walkPointSet = false;
         }
@@ -86,15 +90,16 @@ public class EnemyAi : MonoBehaviour
 
     private void SearchWalkPoint()
     {
+        Debug.Log("1234");
         float randomZ = Random.Range(-enemyType.walkPointRange, enemyType.walkPointRange);
         float randomX = Random.Range(-enemyType.walkPointRange, enemyType.walkPointRange);
 
         walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
 
-        if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
-        {
+        // if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
+        // {
             walkPointSet = true;
-        }
+        // }
     }
 
     private void ChasePlayer()
