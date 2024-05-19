@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 120
   enemyPrefab: {fileID: 0}
-  speed: 5
+  speed: 2.5
   walkPointRange: 12
   timeBetweenAttacks: 0.5
   throwSpeed: 100
   enemyBullet: {fileID: 4074496659085174914, guid: 3bb0ef203717a484ea8bcba2960d97b4,
     type: 3}
-  sightRange: 20
-  attackRange: 13
+  sightRange: 25
+  attackRange: 15
   increaseSightOnGettingAttacked: 5
