@@ -142,6 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 1401839599183363187}
+  enemyType: {fileID: 11400000, guid: 5e5e7ad6347f35646af7df934145e64e, type: 2}
   player: {fileID: 0}
   whatIsGround:
     serializedVersion: 2
@@ -149,15 +150,9 @@ MonoBehaviour:
   whatIsPlayer:
     serializedVersion: 2
     m_Bits: 128
-  health: 120
+  enemyBulletGo: {fileID: 0}
   walkPoint: {x: 0, y: 0, z: 0}
-  walkPointRange: 5
-  EnemyBullet: {fileID: 4074496659085174914, guid: 3bb0ef203717a484ea8bcba2960d97b4,
-    type: 3}
-  timeBetweenAttacks: 0.5
-  throwSpeed: 100
-  sightRange: 20
-  attackRange: 12
-  increaseSightOnGettingAttacked: 5
+  walkPointSet: 0
+  tempWalkPoint: {x: 0, y: 0, z: 0}
   playerInSightRange: 0
   playerInAttackRange: 0
