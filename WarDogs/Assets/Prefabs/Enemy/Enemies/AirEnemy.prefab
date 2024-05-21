@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 1401839599183363187}
-  enemyType: {fileID: 0}
+  enemyType: {fileID: 11400000, guid: 5e5e7ad6347f35646af7df934145e64e, type: 2}
   player: {fileID: 0}
   whatIsGround:
     serializedVersion: 2
@@ -150,6 +150,9 @@ MonoBehaviour:
   whatIsPlayer:
     serializedVersion: 2
     m_Bits: 128
+  enemyBulletGo: {fileID: 0}
   walkPoint: {x: 0, y: 0, z: 0}
+  walkPointSet: 0
+  tempWalkPoint: {x: 0, y: 0, z: 0}
   playerInSightRange: 0
   playerInAttackRange: 0
