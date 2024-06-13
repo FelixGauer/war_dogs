@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2834869552298373088}
   - component: {fileID: 4155635938522298919}
   - component: {fileID: 5146130401869767415}
+  - component: {fileID: -3831415688173493640}
   m_Layer: 0
   m_Name: BulletHoleGraphic
   m_TagString: Untagged
@@ -105,3 +106,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-3831415688173493640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6288971936079567012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4695eba99d1637642be24ef7137ec2f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deactivateTimer: 3
+  damage: 20
+  isBulletHole: 1

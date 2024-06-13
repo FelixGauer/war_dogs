@@ -47,7 +47,7 @@ public class Guns : MonoBehaviour
     private void Awake()
     {
         playerAnim = GetComponentInParent<Animator>();
-        
+        gunReloadBar = GameObject.Find("ReloadSlider").GetComponent<Slider>();
         bulletsLeft = gunStats.magazineSize;
         readyToShoot = true;
     }

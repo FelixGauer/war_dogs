@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1401839599183363187}
   - component: {fileID: 1435545599346148508}
   m_Layer: 8
-  m_Name: GroundEnemy
+  m_Name: Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -141,8 +141,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c4e9993146b98e4b8496001d984723b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 1401839599183363187}
   enemyType: {fileID: 11400000, guid: 5e5e7ad6347f35646af7df934145e64e, type: 2}
+  agent: {fileID: 1401839599183363187}
+  baseOffset: 4
   player: {fileID: 0}
   whatIsGround:
     serializedVersion: 2
