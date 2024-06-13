@@ -9,9 +9,10 @@ public class EnemyAi : MonoBehaviour
 {
     //Increase speed of some enemies on chse state using navmesh agent component 
     
-    public NavMeshAgent agent;
+    [Header("General")]
     public EnemyAIScriptableObject enemyType;
-    
+    public NavMeshAgent agent;
+    public float baseOffset;
     public Transform player;
     public LayerMask whatIsGround;
     public LayerMask whatIsPlayer;
@@ -22,7 +23,6 @@ public class EnemyAi : MonoBehaviour
     public bool walkPointSet;
     public Vector3 tempWalkPoint;
     
-    
     [Header("Attack")]
     private bool alreadyAttacked;
     
@@ -30,39 +30,78 @@ public class EnemyAi : MonoBehaviour
     public bool playerInSightRange;
     public bool playerInAttackRange;
 
+    [Header("ScriptableObjectReferences")] 
+    public float health;
+    public float sightRange;
+    public float attackRange;
+    public float speed;
+    public float increaseSpeedOnGettingAttacked;
+    
     private void Awake()
     {
         // player = GameObject.Find("Player").transform; //for multiplayer do randome.range and maybe use tag
         player = GameObject.FindGameObjectWithTag("Player").transform;
         agent = GetComponent<NavMeshAgent>();
-        agent.speed = enemyType.speed;
         SearchWalkPoint();
+    }
+
+    private void Start()
+    {
+        health = enemyType.health;
+        sightRange = enemyType.sightRange;
+        attackRange = enemyType.attackRange;
+        speed = enemyType.speed;
+        increaseSpeedOnGettingAttacked = enemyType.increaseSightOnGettingAttacked;
+        agent.speed = speed;
+        if (!enemyType.isGroundEnemy)
+        {
+            Debug.Log("Flying Enemy");
+            agent.agentTypeID = -1372625422; //Flying Enemy ID found from Inspector Debug
+            agent.baseOffset = baseOffset;
+        }
     }
 
     private void Update()
     {
         //Check sight and range
-        playerInSightRange = Physics.CheckSphere(transform.position, enemyType.sightRange, whatIsPlayer);
+        playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
 
-        if (playerInSightRange)
+        if (enemyType.doesEnemyPatrol)
         {
-            playerInAttackRange = Physics.CheckSphere(transform.position, enemyType.attackRange, whatIsPlayer);
-        }
+            if (playerInSightRange)
+            {
+                playerInAttackRange = Physics.CheckSphere(transform.position, enemyType.attackRange, whatIsPlayer);
+            }
 
-        if (!playerInSightRange && !playerInAttackRange)
-        {
-            Patrolling();
-        }
+            if (!playerInSightRange && !playerInAttackRange)
+            {
+                Patrolling();
+            }
 
-        if (playerInSightRange && !playerInAttackRange)
+            if (playerInSightRange && !playerInAttackRange)
+            {
+                ChasePlayer();
+                tempWalkPoint = player.position;
+            }
+
+            if (playerInAttackRange && playerInSightRange)
+            {
+                AttackPlayer();
+            }
+        }
+        else
         {
             ChasePlayer();
-            tempWalkPoint = player.position;
-        }
-
-        if (playerInAttackRange && playerInSightRange)
-        {
-            AttackPlayer();
+            
+            if (playerInSightRange)
+            {
+                playerInAttackRange = Physics.CheckSphere(transform.position, enemyType.attackRange, whatIsPlayer);
+            }
+            
+            if (playerInAttackRange && playerInSightRange)
+            {
+                AttackPlayer();
+            }
         }
     }
 
@@ -90,7 +129,6 @@ public class EnemyAi : MonoBehaviour
 
     private void SearchWalkPoint()
     {
-        Debug.Log("1234");
         float randomZ = Random.Range(-enemyType.walkPointRange, enemyType.walkPointRange);
         float randomX = Random.Range(-enemyType.walkPointRange, enemyType.walkPointRange);
 
@@ -101,7 +139,7 @@ public class EnemyAi : MonoBehaviour
             walkPointSet = true;
         // }
     }
-
+    
     private void ChasePlayer()
     {
         agent.SetDestination(player.position);
@@ -141,11 +179,13 @@ public class EnemyAi : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        enemyType.sightRange = enemyType.sightRange + enemyType.increaseSightOnGettingAttacked; //Maybe keep it maybe not
+        //Increase stats on getting attacked
+        sightRange = sightRange + enemyType.increaseSightOnGettingAttacked;
+        speed = speed + increaseSpeedOnGettingAttacked;
         
-        enemyType.health -= damage;
+        health -= damage;
 
-        if (enemyType.health <= 0)
+        if (health <= 0)
         {
              Invoke(nameof(DestroyEnemy), 0.5f);
         }
@@ -154,15 +194,16 @@ public class EnemyAi : MonoBehaviour
     private void DestroyEnemy()
     {
         Debug.Log("Dead");
-        Destroy(this.gameObject);
+        WaveSpawner.instance.enemiesAlive--;
+        this.gameObject.SetActive(false);
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, enemyType.attackRange);
+        Gizmos.DrawWireSphere(transform.position, attackRange);
 
         Gizmos.color = Color.black;
-        Gizmos.DrawWireSphere(transform.position, enemyType.sightRange);
+        Gizmos.DrawWireSphere(transform.position, sightRange);
     }
 }
