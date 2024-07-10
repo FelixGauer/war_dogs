@@ -13,6 +13,9 @@ public class WallHealth : MonoBehaviour
     public float time;
     public float damage;
     public GameObject spawnPoint;
+    
+    
+    //TODO: Prone to error active the reduction of wallHealth only if wave system is active
     private void Awake()
     {
         wallMat = GetComponent<Renderer>().material;
