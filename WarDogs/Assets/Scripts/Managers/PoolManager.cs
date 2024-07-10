@@ -78,7 +78,6 @@ public class PoolManager : MonoBehaviour
     }
     #endregion
     
-    
     #region Bullet Object Pooling
     
     public GameObject GetPooledBulletObject()
@@ -146,7 +145,7 @@ public class PoolManager : MonoBehaviour
     #endregion
     
     #region Enemy
-    
+
     public GameObject GetPooledEnemy()
     {
         for (int i = 0; i < enemyAmount; i++)
@@ -158,10 +157,10 @@ public class PoolManager : MonoBehaviour
         }
 
         GameObject tmp;
-        tmp = Instantiate(enemyBulletObjectPrefab);
-        tmp.transform.SetParent(enemyBulletObjectContainer.transform);
-        enemyBulletObjectPool.Add(tmp);
-        enemyBulletObjectAmount++;
+        tmp = Instantiate(enemyPrefab); 
+        tmp.transform.SetParent(enemyContainer.transform); 
+        enemyPool.Add(tmp);
+        enemyAmount++;
         return tmp;
     }
     private void EnemyPooling()

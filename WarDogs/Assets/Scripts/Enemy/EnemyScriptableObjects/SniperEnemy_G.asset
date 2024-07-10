@@ -15,12 +15,14 @@ MonoBehaviour:
   health: 120
   enemyPrefab: {fileID: 0}
   speed: 2
-  isGroundEnemy: 1
+  increaseSpeedOnGettingAttacked: 0
   doesEnemyPatrol: 0
+  isGroundEnemy: 1
   walkPointRange: 5
   timeBetweenAttacks: 1
   throwSpeed: 150
-  enemyBullet: {fileID: 0}
+  enemyBullet: {fileID: 4074496659085174914, guid: 3bb0ef203717a484ea8bcba2960d97b4,
+    type: 3}
   sightRange: 0
   attackRange: 100
   increaseSightOnGettingAttacked: 15

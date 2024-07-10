@@ -10,8 +10,10 @@ public class EnemyAIScriptableObject : ScriptableObject
     public GameObject enemyPrefab;
     public float speed;
     public float increaseSpeedOnGettingAttacked;
-    public bool isGroundEnemy;
     public bool doesEnemyPatrol;
+    
+    [Header("EnemyTypeBool")]
+    public bool isGroundEnemy;
     
     [Header("Patrol")]
     public float walkPointRange;
