@@ -24,6 +24,7 @@ public class WaveSpawner : MonoBehaviour
     public List<GameObject> activeSpawnPoints = new List<GameObject>();
 
     [Header("EnemySpawning")]
+    public int additionalMaxEnemies = 2;
     public int minEnemies = 2;
     public int additionalEnemiesPerWave = 2;
     public int additionalEnemiesPerBreaches = 2;
@@ -57,8 +58,14 @@ public class WaveSpawner : MonoBehaviour
     {
         wave++;
         waveNum.text = "Wave: " + wave.ToString(); //Display number of waves
-
+        maxEnemies = maxEnemies + additionalMaxEnemies;
         enemiesToSpawn = minEnemies + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches);
+        
+        if(enemiesToSpawn >= maxEnemies) 
+        {
+            enemiesToSpawn = maxEnemies;
+        }
+        
         Debug.Log("2");
         for (int i = 0; i < numberOfEnemies; i++)
         {
