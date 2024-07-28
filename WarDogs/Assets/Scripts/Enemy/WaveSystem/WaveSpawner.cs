@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -14,7 +15,9 @@ public class WaveSpawner : MonoBehaviour
     public GameObject enemyPrefab;
     private GameObject spawnPoint;
     public GameObject enemyGo;
-    
+    private bool waveIncremented = false;
+    private bool randomiseSpawn;
+
     [Header("NotControlledValues - Change to Private in future")]
     public int maxEnemies;
     public int enemiesAlive = 0;
@@ -23,6 +26,10 @@ public class WaveSpawner : MonoBehaviour
     public GameObject[] spawnPoints;
     public List<GameObject> activeSpawnPoints = new List<GameObject>();
 
+    [Header("Boss Wave Settings")]
+    public EnemyAIScriptableObject bossEnemy; //Change to array if more bosses are introduced
+    public int reduceSpawnByDivision = 2; //divide the spawn by this number to reduce the number of enemies spawned
+    
     [Header("EnemySpawning")]
     public int additionalMaxEnemies = 2;
     public int minEnemies = 2;
@@ -40,24 +47,50 @@ public class WaveSpawner : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        totalEnemyTypes = enemyAiScriptable.Length; // 4, calculates enemy types and put it in int
+        totalEnemyTypes = enemyAiScriptable.Length;
     }
 
     void Update() {
         
         // enemiesLeft.text = "Enemies Left: " + spawnedEnemies.Count.ToString(); //Display number of enemies left
         
-        if (enemiesAlive <= minEnemies) 
+        if (enemiesAlive <= minEnemies)
         {
-            Debug.Log("1");
-            SpawnEnemies(enemiesToSpawn, enemyAiScriptable[Random.Range(0, totalEnemyTypes)]);
+            if (!waveIncremented)
+            {
+                wave++;
+                waveNum.text = "Wave: " + wave.ToString(); //Display number of waves
+                waveIncremented = true;
+            }
+
+            if (wave % 10 == 0 && activeSpawnPoints.Count >= 12) //if active spawn points are more than 50% boss wave 
+            {
+                randomiseSpawn = false;
+                SpawnEnemies(enemiesToSpawn / reduceSpawnByDivision , bossEnemy);
+                return;
+            }
+            else if (wave % 5 == 0) //Particular Enemy Wave
+            {
+                SpawnEnemies(enemiesToSpawn, enemyAiScriptable[Random.Range(0, totalEnemyTypes)]);
+                randomiseSpawn = false;
+                return;
+            }
+            else //Default Wave
+            {
+                randomiseSpawn = true;
+                SpawnEnemies(enemiesToSpawn, enemyAiScriptable[0]);
+                return;
+            }
+        }
+        else
+        {
+            waveIncremented = false;
         }
     }
     
     public void SpawnEnemies(int numberOfEnemies, EnemyAIScriptableObject enemyType)
     {
-        wave++;
-        waveNum.text = "Wave: " + wave.ToString(); //Display number of waves
+
         maxEnemies = maxEnemies + additionalMaxEnemies;
         enemiesToSpawn = minEnemies + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches);
         
@@ -66,26 +99,26 @@ public class WaveSpawner : MonoBehaviour
             enemiesToSpawn = maxEnemies;
         }
         
-        Debug.Log("2");
         for (int i = 0; i < numberOfEnemies; i++)
         {
-            Debug.Log("Spawning Enemy");
 
-            enemyGo = PoolManager.instance.GetPooledEnemy(); // Get the enemy from the pool instead of Instantiating
-            Debug.Log("3");
+            enemyGo = PoolManager.instance.GetPooledEnemy();
             if(enemyGo != null && activeSpawnPoints.Count > 0) {
-                // Select a random EnemyAIScriptableObject
-                enemyType = enemyAiScriptable[Random.Range(0, totalEnemyTypes)];
 
-                enemyGo.GetComponent<EnemyAi>().enemyType = enemyType; // Set the enemyAI script
+                if (randomiseSpawn)
+                {
+                    enemyType = enemyAiScriptable[Random.Range(0, totalEnemyTypes)];
+                }
+
+                enemyGo.GetComponent<EnemyAi>().enemyType = enemyType;
                 Debug.Log(enemyType.name);
 
                 spawnPoint = activeSpawnPoints[Random.Range(0, activeSpawnPoints.Count)];
 
                 enemyGo.transform.position = spawnPoint.transform.position;
                 enemyGo.transform.rotation = spawnPoint.transform.rotation;
-                enemyGo.SetActive(true); // Set the enemy to active
-                enemiesAlive++; // Increment the number of enemies alive
+                enemyGo.SetActive(true);
+                enemiesAlive++;
             }
         }
     }
