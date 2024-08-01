@@ -14,14 +14,17 @@ public class EnemyAi : MonoBehaviour
     public NavMeshAgent agent;
     public float baseOffset;
     public Transform player;
+    public List<Transform> players;
+    public List<PlayerStats> playerStats;
+
     public LayerMask whatIsGround;
     public LayerMask whatIsPlayer;
     public GameObject enemyBulletGo;
     
-    [Header("Patrol")]
-    public Vector3 walkPoint;
-    public bool walkPointSet;
-    public Vector3 tempWalkPoint;
+    // [Header("Patrol")]
+    // public Vector3 walkPoint;
+    // public bool walkPointSet;
+    // public Vector3 tempWalkPoint;
     
     [Header("Attack")]
     private bool alreadyAttacked;
@@ -40,9 +43,22 @@ public class EnemyAi : MonoBehaviour
     private void Awake()
     {
         // player = GameObject.Find("Player").transform; //for multiplayer do randome.range and maybe use tag
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject playerObject in playerObjects)
+        {
+            players.Add(playerObject.transform);
+            PlayerStats stats = playerObject.GetComponentInChildren<PlayerStats>();
+            if (stats != null)
+            {
+                playerStats.Add(stats);
+            }
+        }
+        if (players.Count > 0)
+        {
+            player = players[Random.Range(0, players.Count)];
+        }
         agent = GetComponent<NavMeshAgent>();
-        SearchWalkPoint();
+        // SearchWalkPoint();
     }
 
     private void Start()
@@ -63,48 +79,30 @@ public class EnemyAi : MonoBehaviour
 
     private void Update()
     {
-        //Check sight and range
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
 
-        if (enemyType.doesEnemyPatrol)
+        if (playerInSightRange)
         {
-            if (playerInSightRange)
-            {
-                playerInAttackRange = Physics.CheckSphere(transform.position, enemyType.attackRange, whatIsPlayer);
-            }
-
-            if (!playerInSightRange && !playerInAttackRange)
-            {
-                Patrolling();
-            }
-
-            if (playerInSightRange && !playerInAttackRange)
-            {
-                ChasePlayer();
-                tempWalkPoint = player.position;
-            }
-
-            if (playerInAttackRange && playerInSightRange)
-            {
-                AttackPlayer();
-            }
+            playerInAttackRange = Physics.CheckSphere(transform.position, enemyType.attackRange, whatIsPlayer);
         }
-        else
+
+        if (!playerInSightRange && !playerInAttackRange)
         {
             ChasePlayer();
-            
-            if (playerInSightRange)
-            {
-                playerInAttackRange = Physics.CheckSphere(transform.position, enemyType.attackRange, whatIsPlayer);
-            }
-            
-            if (playerInAttackRange && playerInSightRange)
-            {
-                AttackPlayer();
-            }
+        }
+
+        if (playerInSightRange && !playerInAttackRange)
+        {
+            ChasePlayer();
+        }
+
+        if (playerInAttackRange && playerInSightRange)
+        {
+            AttackPlayer();
         }
     }
 
+    /*
     private void Patrolling()
     {
         // sightRange = sightRange - increaseSightOnGettingAttacked;
@@ -126,7 +124,9 @@ public class EnemyAi : MonoBehaviour
             walkPointSet = false;
         }
     }
+    */
 
+    /*
     private void SearchWalkPoint()
     {
         float randomZ = Random.Range(-enemyType.walkPointRange, enemyType.walkPointRange);
@@ -139,9 +139,30 @@ public class EnemyAi : MonoBehaviour
             walkPointSet = true;
         // }
     }
+    */
     
     private void ChasePlayer()
     {
+        PlayerStats playerStatsScript = player.GetComponentInChildren<PlayerStats>();
+
+        if (playerStatsScript != null)
+        {
+            if (playerStatsScript.health <= 0)
+            {
+                if (players.Count > 0)
+                {
+                    player = players[Random.Range(0, players.Count)];
+                    // Get the PlayerStats script from the new player
+                    playerStatsScript = player.GetComponentInChildren<PlayerStats>();
+                    
+                    if(playerStatsScript.health <= 0)
+                    {
+                        player = players[Random.Range(0, players.Count)];
+                    }
+                }
+            }
+        }
+        
         agent.SetDestination(player.position);
     }
 
