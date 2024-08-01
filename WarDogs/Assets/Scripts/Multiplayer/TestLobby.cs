@@ -23,7 +23,7 @@ public class TestLobby : MonoBehaviour
         };
         await AuthenticationService.Instance.SignInAnonymouslyAsync();  // -- Anonymously loging might have to sync this with steam cloud in future
         
-        playerName = "Kinshuk" + UnityEngine.Random.Range(10, 99);
+        playerName = "Parkers" + UnityEngine.Random.Range(10, 99);
         Debug.Log(playerName);
     }
 

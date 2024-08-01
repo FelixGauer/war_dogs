@@ -77,6 +77,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cbf16c35c560414aa0b107e8d0714e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wallHealthScript: {fileID: 3336529443227015472}
+  totalBreaches: 22
+  breachThresholdPercentage: 0.7
+  increasedBreachHealth: 50
+  hasAdjustedHealth: 0
 --- !u!1 &9189842969027993149
 GameObject:
   m_ObjectHideFlags: 0
