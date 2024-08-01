@@ -28,7 +28,7 @@ public class EnemyAi : MonoBehaviour
     
     [Header("Attack")]
     public float dodgeSpeed;
-    public bool isDodging = false;
+    private bool isDodging = false;
     public float dodgeCooldown;
     private float dodgeTimer = 0f;
     private Vector3 dodgePosition;
@@ -38,6 +38,10 @@ public class EnemyAi : MonoBehaviour
     public bool playerInSightRange;
     public bool playerInAttackRange;
 
+    [Header("Enemy Type Conditions")] 
+    public float increaseBossSpeed;
+    public float bossHealthThreshold = 0.5f;
+    
     [Header("ScriptableObjectReferences")] 
     public float health;
     public float sightRange;
@@ -84,6 +88,8 @@ public class EnemyAi : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log(agent.speed);
+        
         //dodge
         dodgeTimer += Time.deltaTime;
         if (isDodging)
@@ -116,6 +122,8 @@ public class EnemyAi : MonoBehaviour
         {
             AttackPlayer();
         }
+        
+        EnemyTypeCondition();
     }
 
     /*
@@ -232,7 +240,8 @@ public class EnemyAi : MonoBehaviour
             isDodging = true;
             dodgeTimer = 0f;
         }
-        else
+        
+        if(health <= 0)
         {
             Invoke(nameof(DestroyEnemy), 0.5f);
         }
@@ -245,6 +254,25 @@ public class EnemyAi : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
+    private void EnemyTypeCondition()
+    {
+        //check for boss type enemy
+        if (enemyType.isBossEnemy)
+        {
+            bool hasIncreasedSpeed = false;
+
+            Debug.Log("Boss Enemy");
+            float healthThreshold = enemyType.health * bossHealthThreshold;
+
+            if (health <= healthThreshold && !hasIncreasedSpeed)
+            {
+                agent.speed += increaseBossSpeed;
+                Debug.Log(agent.speed + " " + increaseBossSpeed);
+                hasIncreasedSpeed = true;
+            }
+        }
+    }
+    
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
