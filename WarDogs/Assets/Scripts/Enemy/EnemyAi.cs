@@ -27,6 +27,11 @@ public class EnemyAi : MonoBehaviour
     // public Vector3 tempWalkPoint;
     
     [Header("Attack")]
+    public float dodgeSpeed;
+    public bool isDodging = false;
+    public float dodgeCooldown;
+    private float dodgeTimer = 0f;
+    private Vector3 dodgePosition;
     private bool alreadyAttacked;
     
     [Header("About States")]
@@ -79,6 +84,17 @@ public class EnemyAi : MonoBehaviour
 
     private void Update()
     {
+        //dodge
+        dodgeTimer += Time.deltaTime;
+        if (isDodging)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, dodgePosition, dodgeSpeed * Time.deltaTime);
+            if (transform.position == dodgePosition)
+            {
+                isDodging = false;
+            }
+        }
+        
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
 
         if (playerInSightRange)
@@ -206,9 +222,19 @@ public class EnemyAi : MonoBehaviour
         
         health -= damage;
 
-        if (health <= 0)
+        if (health > 0 && dodgeTimer >= dodgeCooldown)
         {
-             Invoke(nameof(DestroyEnemy), 0.5f);
+            // Dodge the next attack
+            int dodgeDirection = (Random.Range(0, 2) * 2 - 1) * 2; // Generates either -2 or 2
+            Vector3 towardsPlayer = (player.position - transform.position).normalized;
+            Vector3 dodgeVector = Vector3.Cross(towardsPlayer, Vector3.up) * dodgeDirection;
+            dodgePosition = transform.position + dodgeVector;
+            isDodging = true;
+            dodgeTimer = 0f;
+        }
+        else
+        {
+            Invoke(nameof(DestroyEnemy), 0.5f);
         }
     }
 
