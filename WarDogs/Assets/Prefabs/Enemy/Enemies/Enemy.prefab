@@ -250,7 +250,9 @@ MonoBehaviour:
   enemyType: {fileID: 11400000, guid: 5e5e7ad6347f35646af7df934145e64e, type: 2}
   agent: {fileID: 1401839599183363187}
   baseOffset: 4
+  player: {fileID: 0}
   players: []
+  playerStats: []
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
@@ -258,7 +260,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   enemyBulletGo: {fileID: 0}
-  playerRandomIndex: 0
+  dodgeSpeed: 10
+  isDodging: 0
+  dodgeCooldown: 4
   playerInSightRange: 0
   playerInAttackRange: 0
   health: 0
