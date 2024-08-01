@@ -16,10 +16,13 @@ public class EnemyAi : MonoBehaviour
     public Transform player;
     public List<Transform> players;
     public List<PlayerStats> playerStats;
-
     public LayerMask whatIsGround;
     public LayerMask whatIsPlayer;
     public GameObject enemyBulletGo;
+    
+    [Header("Testing")] //Remove after model impliementation
+    public Material groundEnemyMaterial;
+    public Material flyingEnemyMaterial;
     
     // [Header("Patrol")]
     // public Vector3 walkPoint;
@@ -258,9 +261,17 @@ public class EnemyAi : MonoBehaviour
     {
         //check for boss type enemy
         if (enemyType.isBossEnemy)
-        {
+        { 
             bool hasIncreasedSpeed = false;
-
+            bool hasIncreasedTransform = false;
+            
+            //Remove this once models are impliemented
+            if (!hasIncreasedTransform)
+            {
+                transform.localScale = new Vector3(3, 3, 3);
+                hasIncreasedTransform = true;
+            }
+            
             Debug.Log("Boss Enemy");
             float healthThreshold = enemyType.health * bossHealthThreshold;
 
@@ -270,6 +281,24 @@ public class EnemyAi : MonoBehaviour
                 Debug.Log(agent.speed + " " + increaseBossSpeed);
                 hasIncreasedSpeed = true;
             }
+        } //boss enemy
+
+        
+        bool hasChangedMaterial = false;
+        if (!hasChangedMaterial)
+        {
+            if (enemyType.isGroundEnemy)
+            {
+                Renderer renderer = GetComponent<Renderer>();
+                renderer.material = groundEnemyMaterial;
+            }
+            else
+            {
+                Renderer renderer = GetComponent<Renderer>();
+                renderer.material = flyingEnemyMaterial;
+            }
+
+            hasChangedMaterial = true;
         }
     }
     
