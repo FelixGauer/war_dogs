@@ -16,8 +16,8 @@ MonoBehaviour:
   enemyPrefab: {fileID: 0}
   speed: 5
   increaseSpeedOnGettingAttacked: 1.5
-  isGroundEnemy: 1
-  doesEnemyPatrol: 0
+  isGroundEnemy: 0
+  isBossEnemy: 0
   walkPointRange: 12
   timeBetweenAttacks: 0.5
   throwSpeed: 100

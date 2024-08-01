@@ -260,6 +260,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   enemyBulletGo: {fileID: 0}
+  groundEnemyMaterial: {fileID: 2100000, guid: d91b929d8ba8f26499dc1f93d614204f, type: 2}
+  flyingEnemyMaterial: {fileID: 2100000, guid: df8bdb96ef084f94287f44aab5e20606, type: 2}
   dodgeSpeed: 10
   dodgeCooldown: 4
   playerInSightRange: 0
