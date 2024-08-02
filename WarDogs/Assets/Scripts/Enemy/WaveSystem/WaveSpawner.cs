@@ -31,7 +31,7 @@ public class WaveSpawner : MonoBehaviour
     public int reduceSpawnByDivision = 2; //divide the spawn by this number to reduce the number of enemies spawned
     
     [Header("EnemySpawning")]
-    public int additionalMaxEnemies = 2;
+    public int additionalMaxEnemies = 2; //Gamedesigners vars
     public int minEnemies = 2;
     public int additionalEnemiesPerWave = 2;
     public int additionalEnemiesPerBreaches = 2;
@@ -93,8 +93,19 @@ public class WaveSpawner : MonoBehaviour
 
         maxEnemies = maxEnemies + additionalMaxEnemies;
         enemiesToSpawn = minEnemies + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches);
-        
-        if(enemiesToSpawn >= maxEnemies) 
+
+        //I'm thinking the biggest problem is how the brakets are facorized. Instead I'm thinking:
+        //- large inital addition to min enemies (can be done already)
+        //- the system should take into account how many enemies are still left
+        //- additional breaches and waev progression should work additively
+        //      that could be achieved with:
+        //          - additionalEnemiesper Breach/Wave are either 1 or > 1 and rounding up. Keeping this is a factor is still smart, if we want to ge below 1
+        //- use maxenemies as the hardcap for performance reasons so no +additionalmaxenemies
+        //- add another variable instead, let's call it optimalEnemies
+        //  optimalEnemies = min + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches))
+        //- enemiestospawn = (optimalEnemies - enemiesstillleft) * additional factor of >1 so there is always a dynamic spawn
+
+        if (enemiesToSpawn >= maxEnemies) 
         {
             enemiesToSpawn = maxEnemies;
         }
