@@ -7,12 +7,14 @@ public class PermanentPartsHandler : MonoBehaviour
 {
     
     public float health;
+    public bool isDestroyed = false;
     private float damage;
     
     void Update()
     {
         if(health <= 0)
         {
+            isDestroyed = true;
             Destroy(gameObject);
         }
     }
@@ -21,7 +23,6 @@ public class PermanentPartsHandler : MonoBehaviour
     {
         if (other.CompareTag("EnemyBullet") && health >= -1f)
         {
-            Debug.Log("DAMAGE TAKEN");
             damage = other.GetComponent<BulletHandler>().damage;
             health -= damage;
         }

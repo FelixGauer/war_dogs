@@ -13,6 +13,7 @@ public class PlayerStats : MonoBehaviour
     public float damage;
     public float respawnTimer;
     public float respawnTimeIncrease;
+    public bool isDead;
     
     [Header("References")]
     public FirstPersonController fpsControllerScript;
@@ -40,6 +41,7 @@ public class PlayerStats : MonoBehaviour
             fpsControllerScript.enabled = false;
             gunsScript.enabled = false;
             gameManager.currentAlivePlayers--; //Fix this
+            isDead = true;
             Respawn();
             //Kill Player
             
@@ -76,6 +78,7 @@ public class PlayerStats : MonoBehaviour
             respawnTimer =+ respawnTimeIncrease;
             health = maxHealth;
             allowToHeal = true;
+            isDead = false;
         }
     }
 }

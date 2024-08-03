@@ -17,6 +17,7 @@ public class WaveSpawner : MonoBehaviour
     public GameObject enemyGo;
     private bool waveIncremented = false;
     private bool randomiseSpawn;
+    private int breakLength; // in seconds
 
     [Header("NotControlledValues - Change to Private in future")]
     public int maxEnemies;
@@ -32,7 +33,7 @@ public class WaveSpawner : MonoBehaviour
     
     [Header("EnemySpawning")]
     public int additionalMaxEnemies = 2; //Gamedesigners vars
-    public int minEnemies = 2;
+    public int minEnemies; //Spawn next wave when only this many enemies are left
     public int additionalEnemiesPerWave = 2;
     public int additionalEnemiesPerBreaches = 2;
 
@@ -71,8 +72,9 @@ public class WaveSpawner : MonoBehaviour
             }
             else if (wave % 5 == 0) //Particular Enemy Wave
             {
-                SpawnEnemies(enemiesToSpawn, enemyAiScriptable[Random.Range(0, totalEnemyTypes)]);
                 randomiseSpawn = false;
+                StartCoroutine(BreakSpawnEnemies(breakLength, enemyAiScriptable[Random.Range(0, totalEnemyTypes)]));
+                SpawnEnemies(enemiesToSpawn, enemyAiScriptable[Random.Range(0, totalEnemyTypes)]);
                 return;
             }
             else //Default Wave
@@ -88,20 +90,20 @@ public class WaveSpawner : MonoBehaviour
         }
     }
     
-    public void SpawnEnemies(int numberOfEnemies, EnemyAIScriptableObject enemyType)
+    private void SpawnEnemies(int numberOfEnemies, EnemyAIScriptableObject enemyType)
     {
 
         maxEnemies = maxEnemies + additionalMaxEnemies;
-        enemiesToSpawn = minEnemies + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches);
+        enemiesToSpawn = ((minEnemies + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches)) - enemiesAlive);
 
-        //I'm thinking the biggest problem is how the brakets are facorized. Instead I'm thinking:
-        //- large inital addition to min enemies (can be done already)
-        //- the system should take into account how many enemies are still left
+        //I'm thinking the biggest problem is how the brakets are facorized. Instead I'm thinking: (Added " --- DONE" to the ones that I think are done)
+        //- large inital addition to min enemies (can be done already) --- DONE
+        //- the system should take into account how many enemies are still left --- DONE, enemiesAlive
         //- additional breaches and waev progression should work additively (which it does). Keeping this is a factor is still smart, if we want to ge below 1
-        //- use maxenemies as the hardcap for performance reasons so no +additionalmaxenemies
-        //- add another variable instead, let's call it optimalEnemies
-        //  optimalEnemies = min + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches)
-        //- enemiestospawn = (optimalEnemies - enemiesstillleft) * additional factor of >1 so there is always a dynamic spawn
+        //- use maxenemies as the hardcap for performance reasons so no + additionalmaxenemies -- Remove maxEnemies += additionalMaxEnemies to hard cap 
+        //- add another variable instead, let's call it optimalEnemies --- DONE (added in current statement only)
+        //  optimalEnemies = min + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches) --- DONE
+        //- enemiestospawn = (optimalEnemies - enemiesstillleft) * additional factor of >1 so there is always a dynamic spawn rate --- Cannot multiply with 0.75f, we are working with int
 
         if (enemiesToSpawn >= maxEnemies) 
         {
@@ -120,7 +122,6 @@ public class WaveSpawner : MonoBehaviour
                 }
 
                 enemyGo.GetComponent<EnemyAi>().enemyType = enemyType;
-                Debug.Log(enemyType.name);
 
                 spawnPoint = activeSpawnPoints[Random.Range(0, activeSpawnPoints.Count)];
 
@@ -129,6 +130,20 @@ public class WaveSpawner : MonoBehaviour
                 enemyGo.SetActive(true);
                 enemiesAlive++;
             }
+        }
+    }
+    
+    private IEnumerator BreakSpawnEnemies(int duration, EnemyAIScriptableObject enemyType)
+    {
+        float startTime = Time.time;
+
+        while (Time.time < startTime + duration)
+        {
+            if (enemiesAlive < minEnemies)
+            {
+                SpawnEnemies(minEnemies - enemiesAlive, enemyType);
+            }
+            yield return new WaitForSeconds(duration);
         }
     }
 }

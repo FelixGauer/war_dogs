@@ -24,11 +24,6 @@ public class EnemyAi : MonoBehaviour
     public Material groundEnemyMaterial;
     public Material flyingEnemyMaterial;
     
-    // [Header("Patrol")]
-    // public Vector3 walkPoint;
-    // public bool walkPointSet;
-    // public Vector3 tempWalkPoint;
-    
     [Header("Attack")]
     public float dodgeSpeed;
     private bool isDodging = false;
@@ -54,7 +49,7 @@ public class EnemyAi : MonoBehaviour
     
     private void Awake()
     {
-        // player = GameObject.Find("Player").transform; //for multiplayer do randome.range and maybe use tag
+        // Find GameObjects with Players
         GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject playerObject in playerObjects)
         {
@@ -65,12 +60,20 @@ public class EnemyAi : MonoBehaviour
                 playerStats.Add(stats);
             }
         }
+        
+        // Find GameObjects with PermanentParts
+        GameObject[] permanentPartsObjectsArray = GameObject.FindGameObjectsWithTag("PermanentPart");
+        foreach (GameObject permanentPartObject in permanentPartsObjectsArray)
+        {
+            players.Add(permanentPartObject.transform);
+        }
+        
         if (players.Count > 0)
         {
             player = players[Random.Range(0, players.Count)];
         }
+        
         agent = GetComponent<NavMeshAgent>();
-        // SearchWalkPoint();
     }
 
     private void Start()
@@ -81,9 +84,9 @@ public class EnemyAi : MonoBehaviour
         speed = enemyType.speed;
         increaseSpeedOnGettingAttacked = enemyType.increaseSightOnGettingAttacked;
         agent.speed = speed;
+        
         if (!enemyType.isGroundEnemy)
         {
-            Debug.Log("Flying Enemy");
             agent.agentTypeID = -1372625422; //Flying Enemy ID found from Inspector Debug
             agent.baseOffset = baseOffset;
         }
@@ -91,8 +94,6 @@ public class EnemyAi : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(agent.speed);
-        
         //dodge
         dodgeTimer += Time.deltaTime;
         if (isDodging)
@@ -126,69 +127,28 @@ public class EnemyAi : MonoBehaviour
             AttackPlayer();
         }
         
+        //If gameObject is null, it removes it from the list and switch target to another player
+        if(player == null)
+        {
+            for (int i = players.Count - 1; i >= 0; i--)
+            {
+                if (players[i] == null)
+                {
+                    players.RemoveAt(i);
+                }
+            }
+            
+            Debug.Log(player);
+            player = players[Random.Range(0, players.Count)];
+            agent.SetDestination(player.position);
+        }
+        
         EnemyTypeCondition();
     }
-
-    /*
-    private void Patrolling()
-    {
-        // sightRange = sightRange - increaseSightOnGettingAttacked;
-        if (!walkPointSet || tempWalkPoint == this.transform.position)
-        {
-            SearchWalkPoint();
-        }
-
-        if (walkPointSet)
-        {
-            agent.SetDestination(walkPoint);
-        }
-
-        Vector3 distanceToWalkPoint = transform.position - walkPoint;
-        
-        //Walkpoint Reached
-        if (distanceToWalkPoint.magnitude < 2f)
-        {
-            walkPointSet = false;
-        }
-    }
-    */
-
-    /*
-    private void SearchWalkPoint()
-    {
-        float randomZ = Random.Range(-enemyType.walkPointRange, enemyType.walkPointRange);
-        float randomX = Random.Range(-enemyType.walkPointRange, enemyType.walkPointRange);
-
-        walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-
-        // if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
-        // {
-            walkPointSet = true;
-        // }
-    }
-    */
     
     private void ChasePlayer()
     {
-        PlayerStats playerStatsScript = player.GetComponentInChildren<PlayerStats>();
-
-        if (playerStatsScript != null)
-        {
-            if (playerStatsScript.health <= 0)
-            {
-                if (players.Count > 0)
-                {
-                    player = players[Random.Range(0, players.Count)];
-                    // Get the PlayerStats script from the new player
-                    playerStatsScript = player.GetComponentInChildren<PlayerStats>();
-                    
-                    if(playerStatsScript.health <= 0)
-                    {
-                        player = players[Random.Range(0, players.Count)];
-                    }
-                }
-            }
-        }
+        Debug.Log("Chasing Player");
         
         agent.SetDestination(player.position);
     }
@@ -281,8 +241,7 @@ public class EnemyAi : MonoBehaviour
                 Debug.Log(agent.speed + " " + increaseBossSpeed);
                 hasIncreasedSpeed = true;
             }
-        } //boss enemy
-
+        } 
         
         bool hasChangedMaterial = false;
         if (!hasChangedMaterial)
