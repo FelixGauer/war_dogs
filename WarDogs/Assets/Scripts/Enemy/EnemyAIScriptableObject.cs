@@ -7,17 +7,14 @@ public class EnemyAIScriptableObject : ScriptableObject
 {
     [Header("About Enemy")]
     public float health;
+    public float damage;
     public GameObject enemyPrefab;
     public float speed;
     public float increaseSpeedOnGettingAttacked;
-    // public bool doesEnemyPatrol;
     
     [Header("EnemyTypeBool")]
     public bool isGroundEnemy;
     public bool isBossEnemy;
-    
-    [Header("Patrol")]
-    public float walkPointRange;
     
     [Header("Attack")]
     public float timeBetweenAttacks;

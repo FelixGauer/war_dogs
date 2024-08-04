@@ -7,7 +7,7 @@ using UnityEngine;
 public class BulletHandler : MonoBehaviour
 {
     public float deactivateTimer;
-    public float damage = 20;
+    // public float damage = 20;
     public bool isBulletHole;
     
     private void Update()

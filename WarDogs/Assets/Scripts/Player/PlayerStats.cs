@@ -52,11 +52,10 @@ public class PlayerStats : MonoBehaviour
     {
         if (other.CompareTag("EnemyBullet") && health >= -1f)
         {
-            Debug.Log("damageTaken");
             gameManager.currentAlivePlayers++;
             allowToHeal = false;
-            damage = other.GetComponent<BulletHandler>().damage;
-            health -= damage;
+            // damage = other.GetComponent<BulletHandler>().damage;
+            // health -= damage;
             StartCoroutine(HealthBool());
         }
     }

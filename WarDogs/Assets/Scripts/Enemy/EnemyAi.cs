@@ -15,7 +15,7 @@ public class EnemyAi : MonoBehaviour
     public float baseOffset;
     public Transform player;
     public List<Transform> players;
-    public List<PlayerStats> playerStats;
+    private PlayerStats playerStats;
     public LayerMask whatIsGround;
     public LayerMask whatIsPlayer;
     public GameObject enemyBulletGo;
@@ -23,8 +23,9 @@ public class EnemyAi : MonoBehaviour
     [Header("Testing")] //Remove after model impliementation
     public Material groundEnemyMaterial;
     public Material flyingEnemyMaterial;
-    
-    [Header("Attack")]
+
+    [Header("Attack")] 
+    public GameObject firePoint;
     public float dodgeSpeed;
     private bool isDodging = false;
     public float dodgeCooldown;
@@ -40,8 +41,9 @@ public class EnemyAi : MonoBehaviour
     public float increaseBossSpeed;
     public float bossHealthThreshold = 0.5f;
     
-    [Header("ScriptableObjectReferences")] 
+    [Header("ScriptableObjectReferences --- Goes Private in future as well")] 
     public float health;
+    public float damage;
     public float sightRange;
     public float attackRange;
     public float speed;
@@ -54,23 +56,16 @@ public class EnemyAi : MonoBehaviour
         foreach (GameObject playerObject in playerObjects)
         {
             players.Add(playerObject.transform);
-            PlayerStats stats = playerObject.GetComponentInChildren<PlayerStats>();
-            if (stats != null)
-            {
-                playerStats.Add(stats);
-            }
-        }
-        
-        // Find GameObjects with PermanentParts
-        GameObject[] permanentPartsObjectsArray = GameObject.FindGameObjectsWithTag("PermanentPart");
-        foreach (GameObject permanentPartObject in permanentPartsObjectsArray)
-        {
-            players.Add(permanentPartObject.transform);
         }
         
         if (players.Count > 0)
         {
             player = players[Random.Range(0, players.Count)];
+        }
+        
+        if (player != null && player.gameObject.CompareTag("Player"))
+        {
+            playerStats = player.GetComponentInChildren<PlayerStats>();
         }
         
         agent = GetComponent<NavMeshAgent>();
@@ -79,6 +74,7 @@ public class EnemyAi : MonoBehaviour
     private void Start()
     {
         health = enemyType.health;
+        damage = enemyType.damage;
         sightRange = enemyType.sightRange;
         attackRange = enemyType.attackRange;
         speed = enemyType.speed;
@@ -104,20 +100,36 @@ public class EnemyAi : MonoBehaviour
                 isDodging = false;
             }
         }
+
         
-        playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
+        Collider[] collidersInSightRange = Physics.OverlapSphere(transform.position, sightRange);
+        Collider[] collidersInAttackRange = Physics.OverlapSphere(transform.position, attackRange);
 
-        if (playerInSightRange)
+        if (!playerInSightRange)
         {
-            playerInAttackRange = Physics.CheckSphere(transform.position, enemyType.attackRange, whatIsPlayer);
+            foreach (var collider in collidersInSightRange)
+            {
+                if (collider.transform == player)
+                {
+                    playerInSightRange = true;
+                    break;
+                }
+            }
         }
 
-        if (!playerInSightRange && !playerInAttackRange)
+        if (!playerInAttackRange)
         {
-            ChasePlayer();
+            foreach (var collider in collidersInAttackRange)
+            {
+                if (collider.transform == player)
+                {
+                    playerInAttackRange = true;
+                    break;
+                }
+            }
         }
 
-        if (playerInSightRange && !playerInAttackRange)
+        if (!playerInSightRange && !playerInAttackRange || playerStats.isDead)
         {
             ChasePlayer();
         }
@@ -127,36 +139,40 @@ public class EnemyAi : MonoBehaviour
             AttackPlayer();
         }
         
-        //If gameObject is null, it removes it from the list and switch target to another player
-        if(player == null)
-        {
-            for (int i = players.Count - 1; i >= 0; i--)
-            {
-                if (players[i] == null)
-                {
-                    players.RemoveAt(i);
-                }
-            }
-            
-            Debug.Log(player);
-            player = players[Random.Range(0, players.Count)];
-            agent.SetDestination(player.position);
-        }
-        
         EnemyTypeCondition();
     }
     
     private void ChasePlayer()
     {
-        Debug.Log("Chasing Player");
-        
-        agent.SetDestination(player.position);
+        if (playerStats != null && playerStats.isDead)
+        {
+            
+            playerInSightRange = false;
+            playerInAttackRange = false;
+            
+            for (int i = players.Count - 1; i >= 0; i--)
+            {
+                PlayerStats otherPlayerStats = players[i].GetComponentInChildren<PlayerStats>();
+                if (otherPlayerStats != null && !otherPlayerStats.isDead)
+                {
+                    player = players[i];
+                    playerStats = otherPlayerStats;
+                    break;
+                }
+            }
+        }
+
+        if (player != null)
+        {
+            agent.SetDestination(player.position);
+        }
     }
 
     private void AttackPlayer()
     {
         agent.SetDestination(transform.position);
         transform.LookAt(player);
+        transform.LookAt(firePoint.transform);
 
         if (!alreadyAttacked)
         {
@@ -172,8 +188,18 @@ public class EnemyAi : MonoBehaviour
             }
 
             Rigidbody rb = enemyBulletGo.GetComponent<Rigidbody>();
-            rb.AddForce(transform.forward * enemyType.throwSpeed, ForceMode.Impulse);
-            rb.AddForce(transform.up * 8f, ForceMode.Impulse);
+            enemyBulletGo.transform.position = firePoint.transform.position;
+            Vector3 throwDirection = (player.position - firePoint.transform.position).normalized;
+            rb.AddForce(throwDirection * enemyType.throwSpeed, ForceMode.Impulse); 
+            
+            RaycastHit hit;
+            if (Physics.Raycast(firePoint.transform.position, throwDirection, out hit, sightRange))
+            {
+                if (hit.collider.CompareTag("Player"))
+                {
+                    hit.collider.GetComponent<PlayerStats>().health -= damage;
+                }
+            }
             
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), enemyType.timeBetweenAttacks);

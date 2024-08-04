@@ -23,8 +23,8 @@ public class PermanentPartsHandler : MonoBehaviour
     {
         if (other.CompareTag("EnemyBullet") && health >= -1f)
         {
-            damage = other.GetComponent<BulletHandler>().damage;
-            health -= damage;
+            // damage = other.GetComponent<BulletHandler>().damage;
+            // health -= damage;
         }
     }
 }
