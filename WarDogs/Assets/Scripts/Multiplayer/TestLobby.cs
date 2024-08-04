@@ -21,7 +21,7 @@ public class TestLobby : MonoBehaviour
         {
             Debug.Log("Signed in" + AuthenticationService.Instance.PlayerId);
         };
-        // await AuthenticationService.Instance.SignInAnonymouslyAsync();  // -- Anonymously loging might have to sync this with steam cloud in future 
+        await AuthenticationService.Instance.SignInAnonymouslyAsync();  // -- Anonymously loging might have to sync this with steam cloud in future 
         //This method is being called in testRelay as well so check where it needs to be called
         
         playerName = "Parkers" + UnityEngine.Random.Range(10, 99);

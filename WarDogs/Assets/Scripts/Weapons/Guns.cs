@@ -100,9 +100,7 @@ public class Guns : MonoBehaviour
         {
             if (rayHit.collider.CompareTag("Enemy"))
             {
-                Debug.Log("Hit");
                 rayHit.collider.GetComponent<EnemyAi>().TakeDamage(gunStats.damage);
-                
             }
         }
 

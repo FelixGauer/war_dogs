@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 5600027865519836041}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.03, y: 0.056, z: 0.551}
+  m_LocalPosition: {x: 0.03, y: 0.056, z: 0.639}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.71}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -250,9 +250,8 @@ MonoBehaviour:
   enemyType: {fileID: 11400000, guid: 5e5e7ad6347f35646af7df934145e64e, type: 2}
   agent: {fileID: 1401839599183363187}
   baseOffset: 4
-  player: {fileID: 0}
+  player: {fileID: 5365462296395314267}
   players: []
-  playerStats: []
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
@@ -262,6 +261,7 @@ MonoBehaviour:
   enemyBulletGo: {fileID: 0}
   groundEnemyMaterial: {fileID: 2100000, guid: d91b929d8ba8f26499dc1f93d614204f, type: 2}
   flyingEnemyMaterial: {fileID: 2100000, guid: df8bdb96ef084f94287f44aab5e20606, type: 2}
+  firePoint: {fileID: 5600027865519836041}
   dodgeSpeed: 10
   dodgeCooldown: 4
   playerInSightRange: 0
