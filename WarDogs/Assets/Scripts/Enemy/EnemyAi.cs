@@ -14,7 +14,7 @@ public class EnemyAi : MonoBehaviour
     public NavMeshAgent agent;
     public float baseOffset;
     public Transform player;
-    public List<Transform> players;
+    public List<Transform> targets;
     private PlayerStats playerStats;
     public LayerMask whatIsGround;
     public LayerMask whatIsPlayer;
@@ -55,12 +55,12 @@ public class EnemyAi : MonoBehaviour
         GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject playerObject in playerObjects)
         {
-            players.Add(playerObject.transform);
+            targets.Add(playerObject.transform);
         }
         
-        if (players.Count > 0)
+        if (targets.Count > 0)
         {
-            player = players[Random.Range(0, players.Count)];
+            player = targets[Random.Range(0, targets.Count)];
         }
         
         if (player != null && player.gameObject.CompareTag("Player"))
@@ -150,12 +150,12 @@ public class EnemyAi : MonoBehaviour
             playerInSightRange = false;
             playerInAttackRange = false;
             
-            for (int i = players.Count - 1; i >= 0; i--)
+            for (int i = targets.Count - 1; i >= 0; i--)
             {
-                PlayerStats otherPlayerStats = players[i].GetComponentInChildren<PlayerStats>();
+                PlayerStats otherPlayerStats = targets[i].GetComponentInChildren<PlayerStats>();
                 if (otherPlayerStats != null && !otherPlayerStats.isDead)
                 {
-                    player = players[i];
+                    player = targets[i];
                     playerStats = otherPlayerStats;
                     break;
                 }
