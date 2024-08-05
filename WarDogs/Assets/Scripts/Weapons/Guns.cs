@@ -7,10 +7,12 @@ using UnityEngine.UI;
 
 public class Guns : MonoBehaviour
 {
+    [Header("Gun Stats scriptable object")]
     public GunsScriptableObjects gunStats;
     
     //Gun stats
-    int bulletsLeft, bulletsShot;
+    [Header("Guns General Stats")]
+    private int bulletsLeft, bulletsShot;
     public Transform gunTransform;
     private Vector3 direction;
     private float x;
@@ -21,40 +23,27 @@ public class Guns : MonoBehaviour
     public float throwSpeed;
     public Rigidbody rb;
     
-    //Recoil
-    [Range(0, 7f)] public float recoilAmountY;
-    [Range(0, 3f)] public float recoilAmountX;
-    [Range(0, 10f)] public float maxRecoilTime;
-    public float currentRecoilXPos;
-    public float currenRecoilYPos;
-    private float timePressed;
-    
-    //bools 
+    [Header("Bools")]
     bool shooting, readyToShoot, reloading;
 
-    //Reference
+    [Header("References")]
     public Camera fpsCam;
     public Transform attackPoint;
     public RaycastHit rayHit;
     public LayerMask whatIsEnemy;
 
-    //Graphics
+    [Header("Graphics")]
     public GameObject bulletHoleGraphic;
-    public float camShakeMagnitude, camShakeDuration;
-
-    public Animator playerAnim;
-
+    
     private void Awake()
     {
         fpsCam = GetComponentInParent<Camera>();
-        playerAnim = GetComponentInParent<Animator>();
         gunReloadBar = GameObject.Find("ReloadSlider").GetComponent<Slider>();
         bulletsLeft = gunStats.magazineSize;
         readyToShoot = true;
     }
     private void Update()
     {
-        Aiming();
         MyInput();
         
         //change this to gun
@@ -179,19 +168,7 @@ public class Guns : MonoBehaviour
         bulletsLeft = gunStats.magazineSize;
         reloading = false;
     }
-
-    private void Aiming()
-    {
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            playerAnim.SetBool("Aiming", true);
-        }
-        
-        if(Input.GetKeyDown(KeyCode.U))
-        {
-            playerAnim.SetBool("Aiming", false);
-        }
-    }
+    
     
     private void OnDrawGizmosSelected()
     {

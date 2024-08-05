@@ -24,6 +24,10 @@ MonoBehaviour:
   gunPrefab: {fileID: 0}
   bulletObject: 0
   recoil: 0
+  recoilResetSpeed: 0
+  recoilRotationSpeed: 0
+  camShakeMagnitude: 15.15
+  camShakeDuration: 2.99
   material: {fileID: 2100000, guid: d565eb01e0d91d74bad1138c2d235fe3, type: 2}
   animationCurve:
     serializedVersion: 2
