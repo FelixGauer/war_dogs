@@ -5,6 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Guns", menuName = "Gun", order = 1)]
 public class GunsScriptableObjects : ScriptableObject
 {
+    [Header("Guns General Stats")]
     public int damage;
     public float fireRate;
     public float spread;
@@ -16,9 +17,17 @@ public class GunsScriptableObjects : ScriptableObject
     public bool allowButtonHold;
     public GameObject gunPrefab;
     public bool bulletObject;
-    public float recoil;
     
-    //Trail Renderer
+    [Header("Recoil")]
+    public float recoil;
+    public float recoilResetSpeed;
+    public float recoilRotationSpeed;
+    
+    [Header("CameraShake")]
+    public float camShakeMagnitude;
+    public float camShakeDuration;
+    
+    [Header("Graphics")]
     public Material material;
     public AnimationCurve animationCurve;
     public float duration;
