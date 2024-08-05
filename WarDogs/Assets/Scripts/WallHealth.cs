@@ -13,8 +13,8 @@ public class WallHealth : MonoBehaviour
     private float maxHealth;
     private Material wallMat;
     public float timeCounter;
-    public float time;
-    public float damage;
+    private float time;
+    private float damage;
     public GameObject spawnPoint;
 
     [Header("Repairing")]

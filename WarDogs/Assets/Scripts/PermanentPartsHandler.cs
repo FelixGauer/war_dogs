@@ -2,29 +2,54 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PermanentPartsHandler : MonoBehaviour
 {
     
     public float health;
     public bool isDestroyed = false;
-    private float damage;
+    
+    [Header("Repairing")]
+    public float repairAmount;
+    public bool isRepairing;
+    public PlayerInput playerInput;
     
     void Update()
     {
         if(health <= 0)
         {
             isDestroyed = true;
-            Destroy(gameObject);
+            this.gameObject.SetActive(false);
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("EnemyBullet") && health >= -1f)
+        Debug.Log("Colliding");
+        if (other.CompareTag("Player"))
         {
-            // damage = other.GetComponent<BulletHandler>().damage;
-            // health -= damage;
+            Debug.Log("Player is here");
+            playerInput = other.GetComponentInParent<PlayerInput>();
+
+            if (playerInput != null)
+            {
+                if (playerInput.actions["Repair"].IsPressed())
+                {
+                    Debug.Log("Repairing");
+                    isRepairing = true;
+                    health += repairAmount * Time.deltaTime; 
+                }
+            }
+        }
+    }
+    
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInput = null;
+            isRepairing = false;
         }
     }
 }

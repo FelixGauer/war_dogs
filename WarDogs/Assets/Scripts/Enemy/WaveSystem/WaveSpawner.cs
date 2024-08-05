@@ -36,7 +36,7 @@ public class WaveSpawner : MonoBehaviour
     public int minEnemies; //Spawn next wave when only this many enemies are left
     public int additionalEnemiesPerWave = 2;
     public int additionalEnemiesPerBreaches = 2;
-
+    
     [Header("References")]
     public TextMeshProUGUI waveNum; //These are for us to check the wave number
     public TextMeshProUGUI enemiesLeft; //These are for us to check the number of enemies left
@@ -44,7 +44,7 @@ public class WaveSpawner : MonoBehaviour
     [Header("EnemyAI")]
     public EnemyAIScriptableObject[] enemyAiScriptable; //0:Assault, 1:Crawler, 2:Sniper
     private int totalEnemyTypes;
-
+    
     private void Awake()
     {
         instance = this;
@@ -92,7 +92,6 @@ public class WaveSpawner : MonoBehaviour
     
     private void SpawnEnemies(int numberOfEnemies, EnemyAIScriptableObject enemyType)
     {
-
         maxEnemies = maxEnemies + additionalMaxEnemies;
         enemiesToSpawn = ((minEnemies + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches)) - enemiesAlive);
 
@@ -112,7 +111,6 @@ public class WaveSpawner : MonoBehaviour
         
         for (int i = 0; i < numberOfEnemies; i++)
         {
-
             enemyGo = PoolManager.instance.GetPooledEnemy();
             if(enemyGo != null && activeSpawnPoints.Count > 0) {
 
