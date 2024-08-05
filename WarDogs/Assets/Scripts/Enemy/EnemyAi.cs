@@ -16,9 +16,8 @@ public class EnemyAi : MonoBehaviour
     public Transform player;
     public List<Transform> targets;
     private PlayerStats playerStats;
-    public LayerMask whatIsGround;
-    public LayerMask whatIsPlayer;
     public GameObject enemyBulletGo;
+    public bool isActive;
     
     [Header("Testing")] //Remove after model impliementation
     public Material groundEnemyMaterial;
@@ -41,21 +40,30 @@ public class EnemyAi : MonoBehaviour
     public float increaseBossSpeed;
     public float bossHealthThreshold = 0.5f;
     
-    [Header("ScriptableObjectReferences --- Goes Private in future as well")] 
-    public float health;
-    public float damage;
-    public float sightRange;
-    public float attackRange;
-    public float speed;
-    public float increaseSpeedOnGettingAttacked;
+    [Header("ScriptableObject References")] 
+    private float health;
+    private float damage;
+    private float sightRange;
+    private float attackRange;
+    private float speed;
+    private float increaseSpeedOnGettingAttacked;
     
     private void Awake()
     {
-        // Find GameObjects with Players
         GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject playerObject in playerObjects)
         {
-            targets.Add(playerObject.transform);
+            // Check if the game object is a root object
+            if (playerObject.transform.parent == null)
+            {
+                targets.Add(playerObject.transform);
+            }
+        }
+
+        GameObject[] partObjects = GameObject.FindGameObjectsWithTag("PermanentPart");
+        foreach (GameObject partObject in partObjects)
+        {
+            targets.Add(partObject.transform);
         }
         
         if (targets.Count > 0)
@@ -100,7 +108,6 @@ public class EnemyAi : MonoBehaviour
                 isDodging = false;
             }
         }
-
         
         Collider[] collidersInSightRange = Physics.OverlapSphere(transform.position, sightRange);
         Collider[] collidersInAttackRange = Physics.OverlapSphere(transform.position, attackRange);
@@ -128,12 +135,25 @@ public class EnemyAi : MonoBehaviour
                 }
             }
         }
-
-        if (!playerInSightRange && !playerInAttackRange || playerStats.isDead)
+        
+        if (!playerInSightRange && !playerInAttackRange)
         {
             ChasePlayer();
         }
 
+        if (player.CompareTag("Player"))
+        {
+            if(playerStats != null && playerStats.isDead)
+            {
+                ChasePlayer();
+            }
+        }
+
+        if (!player.gameObject.activeInHierarchy)
+        {
+            ChasePlayer();
+        }
+        
         if (playerInAttackRange && playerInSightRange)
         {
             AttackPlayer();
@@ -146,7 +166,6 @@ public class EnemyAi : MonoBehaviour
     {
         if (playerStats != null && playerStats.isDead)
         {
-            
             playerInSightRange = false;
             playerInAttackRange = false;
             
@@ -162,9 +181,26 @@ public class EnemyAi : MonoBehaviour
             }
         }
 
+        if (!player.gameObject.activeInHierarchy)
+        {
+            playerInSightRange = false;
+            playerInAttackRange = false;
+            
+            isActive = false;
+            while (!isActive)
+            {
+                player = targets[Random.Range(0, targets.Count)];
+                if (player.gameObject.activeInHierarchy)
+                {
+                    isActive = true;
+                }
+            }
+        }
+
         if (player != null)
         {
             agent.SetDestination(player.position);
+            isActive = false;
         }
     }
 
@@ -177,7 +213,6 @@ public class EnemyAi : MonoBehaviour
         if (!alreadyAttacked)
         {
             // AttackCode
-            Debug.Log("ATTACKED");
             
             enemyBulletGo = PoolManager.instance.GetPooledEnemyBulletObject();
             if (enemyBulletGo != null)
@@ -198,6 +233,18 @@ public class EnemyAi : MonoBehaviour
                 if (hit.collider.CompareTag("Player"))
                 {
                     hit.collider.GetComponent<PlayerStats>().health -= damage;
+                }
+                
+                if (hit.collider.CompareTag("PermanentPart"))
+                {
+                    hit.collider.GetComponent<PermanentPartsHandler>().health -= damage;
+
+                    if (hit.collider.GetComponent<PermanentPartsHandler>().isDestroyed)
+                    {
+                        Debug.Log("Destroyed");
+                        hit.collider.gameObject.SetActive(false);
+                        ChasePlayer();
+                    }
                 }
             }
             

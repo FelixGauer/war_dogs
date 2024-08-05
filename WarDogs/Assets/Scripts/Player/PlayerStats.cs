@@ -36,12 +36,16 @@ public class PlayerStats : MonoBehaviour
 
         if (health <= 0)
         {
+            if (!isDead)
+            {
+                gameManager.currentAlivePlayers--;
+                isDead = true;
+            }
+            
             allowToHeal = false;
             Debug.Log("Dead");
             fpsControllerScript.enabled = false;
             gunsScript.enabled = false;
-            gameManager.currentAlivePlayers--; //Fix this
-            isDead = true;
             Respawn();
             //Kill Player
             
@@ -72,12 +76,17 @@ public class PlayerStats : MonoBehaviour
         
         if(respawnTimer <= 0)
         {
+            if (isDead)
+            {
+                gameManager.currentAlivePlayers++;
+                isDead = false;
+            }
+            
             fpsControllerScript.enabled = true;
             gunsScript.enabled = true;
             respawnTimer =+ respawnTimeIncrease;
             health = maxHealth;
             allowToHeal = true;
-            isDead = false;
         }
     }
 }
