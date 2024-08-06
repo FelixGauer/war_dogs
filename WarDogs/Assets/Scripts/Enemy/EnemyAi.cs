@@ -48,6 +48,11 @@ public class EnemyAi : MonoBehaviour
     private float speed;
     private float increaseSpeedOnGettingAttacked;
     
+    [Header("Audio Refernece")]
+    public AudioClip permanentPartHitAudio;
+    public AudioClip hitAudio;
+    private AudioSource audioSource;
+
     private void Awake()
     {
         GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
@@ -66,6 +71,7 @@ public class EnemyAi : MonoBehaviour
             targets.Add(partObject.transform);
         }
         
+        
         if (targets.Count > 0)
         {
             player = targets[Random.Range(0, targets.Count)];
@@ -77,6 +83,7 @@ public class EnemyAi : MonoBehaviour
         }
         
         agent = GetComponent<NavMeshAgent>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -233,15 +240,16 @@ public class EnemyAi : MonoBehaviour
                 if (hit.collider.CompareTag("Player"))
                 {
                     hit.collider.GetComponent<PlayerStats>().health -= damage;
+                    audioSource.PlayOneShot(hitAudio, 0.75f);
                 }
                 
                 if (hit.collider.CompareTag("PermanentPart"))
                 {
                     hit.collider.GetComponent<PermanentPartsHandler>().health -= damage;
+                    audioSource.PlayOneShot(permanentPartHitAudio, 1f);
 
                     if (hit.collider.GetComponent<PermanentPartsHandler>().isDestroyed)
                     {
-                        Debug.Log("Destroyed");
                         hit.collider.gameObject.SetActive(false);
                         ChasePlayer();
                     }

@@ -255,9 +255,9 @@ GameObject:
   - component: {fileID: 5393215578589016640}
   - component: {fileID: 39675304945322497}
   - component: {fileID: 543925506011316845}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Capsule
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -391,6 +391,7 @@ MonoBehaviour:
   damage: 0
   respawnTimer: 10
   respawnTimeIncrease: 15
+  isDead: 0
   fpsControllerScript: {fileID: 8616685848737228371}
   gunsScript: {fileID: 8948309468294938465}
   gameManager: {fileID: 0}
@@ -520,11 +521,6 @@ MonoBehaviour:
   colorIntensity: 2
   throwSpeed: 0
   rb: {fileID: 0}
-  recoilAmountY: 0
-  recoilAmountX: 0
-  maxRecoilTime: 0
-  currentRecoilXPos: 0
-  currenRecoilYPos: 0
   fpsCam: {fileID: 1574110294821717353}
   attackPoint: {fileID: 1979044321344129817}
   whatIsEnemy:
@@ -532,9 +528,6 @@ MonoBehaviour:
     m_Bits: 256
   bulletHoleGraphic: {fileID: 6288971936079567012, guid: 40f0052121bfdae4f891422040b79331,
     type: 3}
-  camShakeMagnitude: 0
-  camShakeDuration: 0
-  playerAnim: {fileID: 0}
 --- !u!1 &8616685848737228372
 GameObject:
   m_ObjectHideFlags: 0
@@ -615,16 +608,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55919ac34a26952479f3fc91f777b2fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 4
-  SprintSpeed: 6
+  MoveSpeed: 8
+  SprintSpeed: 12
   RotationSpeed: 1
   SpeedChangeRate: 10
-  JumpHeight: 1.2
-  Gravity: -15
+  JumpHeight: 1.64
+  Gravity: -9.81
   JumpTimeout: 0.1
   FallTimeout: 0.15
   Grounded: 1
-  GroundedOffset: -0.14
+  GroundedOffset: 1.52
   GroundedRadius: 0.5
   GroundLayers:
     serializedVersion: 2
@@ -632,6 +625,7 @@ MonoBehaviour:
   CinemachineCameraTarget: {fileID: 4135013735270702863}
   TopClamp: 89
   BottomClamp: -89
+  _mainCamera: {fileID: 0}
 --- !u!114 &1978471637655604388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -779,7 +773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2027524606
+  GlobalObjectIdHash: 3452113739
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
