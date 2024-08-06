@@ -29,7 +29,6 @@ public class Guns : MonoBehaviour
     [Header("References")]
     public Camera fpsCam;
     public Transform attackPoint;
-    public RaycastHit rayHit;
     public LayerMask whatIsEnemy;
 
     [Header("Graphics")]
@@ -78,16 +77,19 @@ public class Guns : MonoBehaviour
     private void Shoot()
     {
         readyToShoot = false;
+        RaycastHit rayHit;
 
         //Spread
         x = Random.Range(-gunStats.spread, gunStats.spread);
         y = Random.Range(gunStats.spread, gunStats.spread);
 
         //Calculate Direction with Spread
+        direction = fpsCam.transform.forward + new Vector3(x, y, 0);
 
         //RayCast
         if (Physics.Raycast(attackPoint.transform.position, direction, out rayHit, gunStats.range, whatIsEnemy))
-        {
+        {    
+
             if (rayHit.collider.CompareTag("Enemy"))
             {
                 rayHit.collider.GetComponent<EnemyAi>().TakeDamage(gunStats.damage);
@@ -125,11 +127,17 @@ public class Guns : MonoBehaviour
         }
         else
         {
-            Debug.Log("22");
             bulletTrailGo.transform.position = attackPoint.position;
             bulletTrailGo.transform.rotation = attackPoint.rotation;
             rb = bulletTrailGo.GetComponent<Rigidbody>();
             rb.velocity = attackPoint.forward * throwSpeed;
+            bulletTrailGo.SetActive(true);
+        }
+        
+        if (bulletTrailGo != null)
+        {
+            bulletTrailGo.transform.position = attackPoint.position;
+            bulletTrailGo.transform.rotation = Quaternion.LookRotation(direction); // Set the rotation to match the direction
             bulletTrailGo.SetActive(true);
         }
         

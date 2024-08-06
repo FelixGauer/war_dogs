@@ -22,11 +22,16 @@ public class WallHealth : MonoBehaviour
     private bool isRepairing;
     private PlayerInput playerInput;
     
+    [Header("Audio Reference")]
+    public AudioClip repairAudio;
+    private AudioSource audioSource;
+    
     //TODO: Prone to error active the reduction of wallHealth only if wave system is active
     private void Awake()
     {
         maxHealth = health;
         wallMat = GetComponent<Renderer>().material;
+        audioSource = GetComponent<AudioSource>();
         time = Random.Range(0, 15);
     }
     
@@ -72,9 +77,18 @@ public class WallHealth : MonoBehaviour
             {
                 if (playerInput.actions["Repair"].IsPressed())
                 {
-                    Debug.Log("Repairing");
                     isRepairing = true;
                     health += repairAmount * Time.deltaTime; 
+                    
+                    if (!audioSource.isPlaying)
+                    {
+                        audioSource.clip = repairAudio;
+                        audioSource.Play();
+                    }
+                }
+                else
+                {
+                    audioSource.Stop();
                 }
             }
         }

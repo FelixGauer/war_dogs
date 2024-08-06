@@ -45,10 +45,20 @@ public class WaveSpawner : MonoBehaviour
     public EnemyAIScriptableObject[] enemyAiScriptable; //0:Assault, 1:Crawler, 2:Sniper
     private int totalEnemyTypes;
     
+    [Header("Audio Reference")]
+    public AudioClip waveStartAudio;
+    private AudioSource audioSource;
+
     private void Awake()
     {
         instance = this;
+        audioSource = GetComponent<AudioSource>();
         totalEnemyTypes = enemyAiScriptable.Length;
+    }
+
+    private void Start()
+    {
+        audioSource.PlayOneShot(waveStartAudio);
     }
 
     void Update() {

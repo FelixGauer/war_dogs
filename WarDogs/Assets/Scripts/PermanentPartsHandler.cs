@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 
 public class PermanentPartsHandler : MonoBehaviour
 {
-    
     public float health;
     public bool isDestroyed = false;
     
@@ -15,18 +14,28 @@ public class PermanentPartsHandler : MonoBehaviour
     public bool isRepairing;
     public PlayerInput playerInput;
     
+    [Header("Audio Reference")]
+    public AudioClip repairAudio;
+    public AudioClip destroyAudio;
+    public AudioSource audioSource;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     void Update()
     {
         if(health <= 0)
         {
             isDestroyed = true;
+            AudioSource.PlayClipAtPoint(destroyAudio, transform.position);
             this.gameObject.SetActive(false);
         }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        Debug.Log("Colliding");
         if (other.CompareTag("Player"))
         {
             Debug.Log("Player is here");
@@ -36,9 +45,21 @@ public class PermanentPartsHandler : MonoBehaviour
             {
                 if (playerInput.actions["Repair"].IsPressed())
                 {
-                    Debug.Log("Repairing");
                     isRepairing = true;
-                    health += repairAmount * Time.deltaTime; 
+                    health += repairAmount * Time.deltaTime;
+                    
+                    if (!audioSource.isPlaying)
+                    {
+                        audioSource.clip = repairAudio;
+                        audioSource.Play();
+                    }
+                }
+                else
+                {
+                    if (audioSource != null)
+                    {
+                        audioSource.Stop();
+                    }
                 }
             }
         }
