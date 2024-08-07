@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Cinemachine;
+using Unity.Netcode;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -9,7 +11,7 @@ namespace StarterAssets
 #if ENABLE_INPUT_SYSTEM
 	[RequireComponent(typeof(PlayerInput))]
 #endif
-	public class FirstPersonController : MonoBehaviour
+	public class FirstPersonController : NetworkBehaviour
 	{
 		[Header("Player")]
 		[Tooltip("Move speed of the character in m/s")]
@@ -50,6 +52,7 @@ namespace StarterAssets
 		public float TopClamp = 90.0f;
 		[Tooltip("How far in degrees can you move the camera down")]
 		public float BottomClamp = -90.0f;
+		public CinemachineVirtualCamera vc;
 
 		// cinemachine
 		private float _cinemachineTargetPitch;
@@ -109,9 +112,26 @@ namespace StarterAssets
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
 		}
+		
+		public override void OnNetworkSpawn()
+		{
+			if (IsOwner)
+			{
+				vc.Priority = 5;
+			}
+			else
+			{
+				vc.Priority = 0;
+			}
+		}
 
 		private void Update()
 		{
+			if (!IsOwner)
+			{
+				return;
+			}
+			
 			JumpAndGravity();
 			GroundedCheck();
 			Move();

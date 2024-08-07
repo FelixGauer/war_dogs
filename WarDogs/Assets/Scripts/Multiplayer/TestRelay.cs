@@ -15,6 +15,7 @@ using UnityEngine.UI;
 public class TestRelay : MonoBehaviour
 {
     [SerializeField] private TMP_InputField joinLobbyCode;
+    public int maxPlayer;
     
     private async void Start()
     {
@@ -24,7 +25,7 @@ public class TestRelay : MonoBehaviour
        {
             Debug.Log("Signed in: " + AuthenticationService.Instance.PlayerId);
        };
-       // await AuthenticationService.Instance.SignInAnonymouslyAsync();
+       await AuthenticationService.Instance.SignInAnonymouslyAsync();
        //This method is being called in testLobby as well so check where it needs to be called
 
     }
@@ -34,7 +35,7 @@ public class TestRelay : MonoBehaviour
         try
         {
             //Takes parameter for max amount of players in a game not including host
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(2);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayer);
 
             //This string is used to connect to friends
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
