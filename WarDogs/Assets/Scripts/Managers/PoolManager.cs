@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class PoolManager : MonoBehaviour
@@ -34,6 +35,14 @@ public class PoolManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
+    }
+
+    private IEnumerator Start()
+    {
+        while (!NetworkManager.Singleton.IsListening)
+        {
+            yield return null;
+        }
         
         BulletTrailPooling();
 
@@ -44,11 +53,11 @@ public class PoolManager : MonoBehaviour
         EnemyPooling();
     }
 
-
     #region Bullet Trail Pooling
     
     public GameObject GetPooledBulletsTrails()
     {
+        
         for (int i = 0; i < bulletTrainAmount; i++)
         {
             if (!bulletTrailPool[i].activeInHierarchy)
@@ -59,6 +68,7 @@ public class PoolManager : MonoBehaviour
 
         GameObject tmp;
         tmp = Instantiate(bulletTrailPrefab);
+        tmp.GetComponent<NetworkObject>().Spawn(true);
         tmp.transform.SetParent(bulletTrailContainer.transform);
         bulletTrailPool.Add(tmp);
         bulletTrainAmount++;
@@ -71,6 +81,7 @@ public class PoolManager : MonoBehaviour
         for (int i = 0; i < bulletTrainAmount; i++)
         {
             tmp = Instantiate(bulletTrailPrefab);
+            tmp.GetComponent<NetworkObject>().Spawn(true);
             tmp.transform.SetParent(bulletTrailContainer.transform);
             tmp.SetActive(false);
             bulletTrailPool.Add(tmp);
@@ -92,6 +103,7 @@ public class PoolManager : MonoBehaviour
 
         GameObject tmp;
         tmp = Instantiate(bulletObjectPrefab);
+        tmp.GetComponent<NetworkObject>().Spawn(true);
         tmp.transform.SetParent(bulletObjectContainer.transform);
         bulletObjectPool.Add(tmp);
         bulletObjectAmount++;
@@ -104,6 +116,7 @@ public class PoolManager : MonoBehaviour
         for (int i = 0; i < bulletObjectAmount; i++)
         {
             tmp = Instantiate(bulletObjectPrefab);
+            tmp.GetComponent<NetworkObject>().Spawn(true);
             tmp.transform.SetParent(bulletObjectContainer.transform);
             tmp.SetActive(false);
             bulletObjectPool.Add(tmp);
@@ -125,6 +138,7 @@ public class PoolManager : MonoBehaviour
 
         GameObject tmp;
         tmp = Instantiate(enemyBulletObjectPrefab);
+        tmp.GetComponent<NetworkObject>().Spawn(true);
         tmp.transform.SetParent(enemyBulletObjectContainer.transform);
         enemyBulletObjectPool.Add(tmp);
         enemyBulletObjectAmount++;
@@ -137,6 +151,7 @@ public class PoolManager : MonoBehaviour
         for (int i = 0; i < enemyBulletObjectAmount; i++)
         {
             tmp = Instantiate(enemyBulletObjectPrefab);
+            tmp.GetComponent<NetworkObject>().Spawn(true);
             tmp.transform.SetParent(enemyBulletObjectContainer.transform);
             tmp.SetActive(false);
             enemyBulletObjectPool.Add(tmp);
@@ -157,7 +172,8 @@ public class PoolManager : MonoBehaviour
         }
 
         GameObject tmp;
-        tmp = Instantiate(enemyPrefab); 
+        tmp = Instantiate(enemyPrefab);
+        tmp.GetComponent<NetworkObject>().Spawn(true);
         tmp.transform.SetParent(enemyContainer.transform); 
         enemyPool.Add(tmp);
         enemyAmount++;
@@ -170,6 +186,7 @@ public class PoolManager : MonoBehaviour
         for (int i = 0; i < enemyAmount; i++)
         {
             tmp = Instantiate(enemyPrefab);
+            tmp.GetComponent<NetworkObject>().Spawn(true);
             tmp.transform.SetParent(enemyContainer.transform);
             tmp.SetActive(false);
             enemyPool.Add(tmp);

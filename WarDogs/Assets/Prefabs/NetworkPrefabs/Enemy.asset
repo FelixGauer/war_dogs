@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e651dbb3fbac04af2b8f5abf007ddc23, type: 3}
-  m_Name: SpawnCube
+  m_Name: Enemy
   m_EditorClassIdentifier: 
   IsDefault: 0
   List:
   - Override: 0
-    Prefab: {fileID: 5360230910743284059, guid: 5f4e01383cae29b469debbec3dbb390d,
+    Prefab: {fileID: 9189114959047826070, guid: c0391ffa983761143a07fdfab4f9cc98,
       type: 3}
     SourcePrefabToOverride: {fileID: 0}
     SourceHashToOverride: 0

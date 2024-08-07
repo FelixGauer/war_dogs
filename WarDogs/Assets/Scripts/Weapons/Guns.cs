@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Guns : MonoBehaviour
+public class Guns : NetworkBehaviour
 {
     [Header("Gun Stats scriptable object")]
     public GunsScriptableObjects gunStats;
@@ -26,6 +27,8 @@ public class Guns : MonoBehaviour
     [Header("Bools")]
     bool shooting, readyToShoot, reloading;
 
+    public bool isLobbyCreated;
+    
     [Header("References")]
     public Camera fpsCam;
     public Transform attackPoint;
@@ -41,20 +44,32 @@ public class Guns : MonoBehaviour
         bulletsLeft = gunStats.magazineSize;
         readyToShoot = true;
     }
+    
+    public bool IsLobbyCreated()
+    {
+        return NetworkManager.Singleton.IsServer;
+    }
+    
     private void Update()
     {
-        MyInput();
+        isLobbyCreated = IsLobbyCreated();
+        IsLobbyCreated();
         
-        //change this to gun
-        // direction = fpsCam.transform.forward + new Vector3(x, y, 0);
-        direction = fpsCam.transform.forward + new Vector3(x, y, 0);
 
-        Quaternion rotation = Quaternion.LookRotation(direction);
-        gunTransform.rotation = rotation;
+        if (IsLobbyCreated())
+        {
+            MyInput();
 
-        gunReloadBar.maxValue = gunStats.magazineSize;
-        gunReloadBar.value = bulletsLeft;
-        
+            //change this to gun
+            // direction = fpsCam.transform.forward + new Vector3(x, y, 0);
+            direction = fpsCam.transform.forward + new Vector3(x, y, 0);
+
+            Quaternion rotation = Quaternion.LookRotation(direction);
+            gunTransform.rotation = rotation;
+
+            gunReloadBar.maxValue = gunStats.magazineSize;
+            gunReloadBar.value = bulletsLeft;
+        }
     }
     private void MyInput()
     {
