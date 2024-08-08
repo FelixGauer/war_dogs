@@ -35,7 +35,7 @@ public class TestRelay : MonoBehaviour
         try
         {
             //Takes parameter for max amount of players in a game not including host
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayer);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
 
             //This string is used to connect to friends
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);

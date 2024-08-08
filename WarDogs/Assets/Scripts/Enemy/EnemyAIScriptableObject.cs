@@ -8,7 +8,7 @@ public class EnemyAIScriptableObject : ScriptableObject
     [Header("About Enemy")]
     public float health;
     public float damage;
-    public GameObject enemyPrefab;
+    // public GameObject enemyPrefab;
     public float speed;
     public float increaseSpeedOnGettingAttacked;
     

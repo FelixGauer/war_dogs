@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour
     {
         if(currentAlivePlayers <= 0)
         {
-            Debug.Log("Game Over");
         }
     }
 }

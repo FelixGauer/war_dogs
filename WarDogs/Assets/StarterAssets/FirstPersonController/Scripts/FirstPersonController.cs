@@ -52,7 +52,7 @@ namespace StarterAssets
 		public float TopClamp = 90.0f;
 		[Tooltip("How far in degrees can you move the camera down")]
 		public float BottomClamp = -90.0f;
-		public CinemachineVirtualCamera vc;
+		// public CinemachineVirtualCamera vc;
 
 		// cinemachine
 		private float _cinemachineTargetPitch;
@@ -73,7 +73,7 @@ namespace StarterAssets
 #endif
 		private CharacterController _controller;
 		private StarterAssetsInputs _input;
-		public GameObject _mainCamera;
+		private GameObject _mainCamera;
 
 		private const float _threshold = 0.01f;
 
@@ -113,24 +113,35 @@ namespace StarterAssets
 			_fallTimeoutDelta = FallTimeout;
 		}
 		
-		public override void OnNetworkSpawn()
-		{
-			if (IsOwner)
-			{
-				vc.Priority = 5;
-			}
-			else
-			{
-				vc.Priority = 0;
-			}
-		}
+		// public override void OnNetworkSpawn()
+		// {
+		// 	if (IsOwner)
+		// 	{
+		// 		vc.Priority = 5;
+		// 	}
+		// 	else
+		// 	{
+		// 		vc.Priority = 0;
+		// 	}
+		// }
 
 		private void Update()
 		{
+			if (_playerInput.currentControlScheme != "KeyboardMouse")
+			{
+				var keyboard = Keyboard.current;
+				var mouse = Mouse.current;
+				
+				// Switch to the "KeyboardMouse" control scheme
+				_playerInput.SwitchCurrentControlScheme("KeyboardMouse", keyboard, mouse);
+			}
+
 			if (!IsOwner)
 			{
 				return;
 			}
+
+			_playerInput.enabled = true;
 			
 			JumpAndGravity();
 			GroundedCheck();

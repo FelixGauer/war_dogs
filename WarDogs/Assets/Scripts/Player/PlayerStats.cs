@@ -23,8 +23,8 @@ public class PlayerStats : MonoBehaviour
     private void Awake()
     {
         fpsControllerScript = GetComponentInParent<FirstPersonController>();
-        gameManager = GameObject.Find("Manager").GetComponent<GameManager>();
-        gameManager.currentPlayer++; //Increase player amount
+        // gameManager = GameObject.Find("Manager").GetComponent<GameManager>();
+        // gameManager.currentPlayer++; //Increase player amount
     }
 
     private void Update()
