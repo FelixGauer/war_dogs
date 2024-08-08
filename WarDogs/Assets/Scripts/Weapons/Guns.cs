@@ -39,7 +39,6 @@ public class Guns : NetworkBehaviour
     
     private void Awake()
     {
-        fpsCam = GetComponentInParent<Camera>();
         gunReloadBar = GameObject.Find("ReloadSlider").GetComponent<Slider>();
         bulletsLeft = gunStats.magazineSize;
         readyToShoot = true;
