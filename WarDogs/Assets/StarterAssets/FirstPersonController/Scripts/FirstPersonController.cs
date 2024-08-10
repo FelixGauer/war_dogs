@@ -52,11 +52,13 @@ namespace StarterAssets
 		public float TopClamp = 90.0f;
 		[Tooltip("How far in degrees can you move the camera down")]
 		public float BottomClamp = -90.0f;
-		// public CinemachineVirtualCamera vc;
-
-		// cinemachine
 		private float _cinemachineTargetPitch;
-
+		public CinemachineVirtualCamera vc;
+		public Camera camera;
+		
+		[Header("Audio")]
+		public AudioListener audioListener;
+		
 		// player
 		private float _speed;
 		private float _rotationVelocity;
@@ -111,19 +113,29 @@ namespace StarterAssets
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
+
+			if (IsOwner)
+			{
+				vc.Follow = transform;
+				vc.LookAt = transform;
+			}
 		}
 		
-		// public override void OnNetworkSpawn()
-		// {
-		// 	if (IsOwner)
-		// 	{
-		// 		vc.Priority = 5;
-		// 	}
-		// 	else
-		// 	{
-		// 		vc.Priority = 0;
-		// 	}
-		// }
+		public override void OnNetworkSpawn()
+		{
+			if (IsOwner)
+			{
+				audioListener.enabled = true;
+				vc.Follow = transform;
+				vc.LookAt = transform;				
+				vc.Priority = 15;
+				
+			}
+			else
+			{
+				vc.Priority = 10;
+			}
+		}
 
 		private void Update()
 		{
@@ -132,7 +144,6 @@ namespace StarterAssets
 				var keyboard = Keyboard.current;
 				var mouse = Mouse.current;
 				
-				// Switch to the "KeyboardMouse" control scheme
 				_playerInput.SwitchCurrentControlScheme("KeyboardMouse", keyboard, mouse);
 			}
 
