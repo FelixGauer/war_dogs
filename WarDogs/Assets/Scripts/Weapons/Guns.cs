@@ -27,7 +27,6 @@ public class Guns : NetworkBehaviour
     [Header("Bools")]
     bool shooting, readyToShoot, reloading;
 
-    public bool isLobbyCreated;
     
     [Header("References")]
     public Camera fpsCam;
@@ -51,9 +50,11 @@ public class Guns : NetworkBehaviour
     
     private void Update()
     {
-        isLobbyCreated = IsLobbyCreated();
-        IsLobbyCreated();
-        
+        if (!IsOwner)
+        {
+            return;
+        }
+
 
         if (IsLobbyCreated())
         {
@@ -70,6 +71,8 @@ public class Guns : NetworkBehaviour
             gunReloadBar.value = bulletsLeft;
         }
     }
+    
+    
     private void MyInput()
     {
         if (gunStats.allowButtonHold) shooting = Input.GetKey(KeyCode.Mouse0);
@@ -156,7 +159,7 @@ public class Guns : NetworkBehaviour
         }
         
         //Graphics
-        Instantiate(bulletHoleGraphic, rayHit.point, Quaternion.Euler(0, 180, 0));
+        // Instantiate(bulletHoleGraphic, rayHit.point, Quaternion.Euler(0, 180, 0));
         // Instantiate(muzzleFlash, attackPoint.position, attackPoint.rotation);
 
         bulletsLeft--;
