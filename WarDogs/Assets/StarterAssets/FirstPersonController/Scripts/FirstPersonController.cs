@@ -54,7 +54,6 @@ namespace StarterAssets
 		public float BottomClamp = -90.0f;
 		private float _cinemachineTargetPitch;
 		public CinemachineVirtualCamera vc;
-		public Camera camera;
 		
 		[Header("Audio")]
 		public AudioListener audioListener;
@@ -96,8 +95,10 @@ namespace StarterAssets
 			// get a reference to our main camera
 			if (_mainCamera == null)
 			{
-				_mainCamera = GetComponentInChildren<Camera>().gameObject;
+				_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 			}
+			audioListener = _mainCamera.GetComponent<AudioListener>();
+
 		}
 
 		private void Start()

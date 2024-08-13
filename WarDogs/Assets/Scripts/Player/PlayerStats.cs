@@ -18,7 +18,6 @@ public class PlayerStats : MonoBehaviour
     [Header("References")]
     public FirstPersonController fpsControllerScript;
     public Guns gunsScript;
-    public GameManager gameManager;
 
     private void Awake()
     {
@@ -38,7 +37,7 @@ public class PlayerStats : MonoBehaviour
         {
             if (!isDead)
             {
-                gameManager.currentAlivePlayers--;
+                GameManager.instance.currentAlivePlayers--;
                 isDead = true;
             }
             
@@ -56,7 +55,7 @@ public class PlayerStats : MonoBehaviour
     {
         if (other.CompareTag("EnemyBullet") && health >= -1f)
         {
-            gameManager.currentAlivePlayers++;
+            GameManager.instance.currentAlivePlayers++;
             allowToHeal = false;
             // damage = other.GetComponent<BulletHandler>().damage;
             // health -= damage;
@@ -78,7 +77,7 @@ public class PlayerStats : MonoBehaviour
         {
             if (isDead)
             {
-                gameManager.currentAlivePlayers++;
+                GameManager.instance.currentAlivePlayers++;
                 isDead = false;
             }
             

@@ -41,7 +41,7 @@ public class EnemyAi : MonoBehaviour
     public float bossHealthThreshold = 0.5f;
     
     [Header("ScriptableObject References")] 
-    private float health;
+    public float health;
     private float damage;
     private float sightRange;
     private float attackRange;

@@ -5,11 +5,15 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
+
+    
     public int currentPlayer;
     public int currentAlivePlayers;
 
     private void Awake()
     {
+        instance = this;
         currentAlivePlayers = currentPlayer;
     }
 
