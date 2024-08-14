@@ -326,7 +326,6 @@ MonoBehaviour:
   isDead: 0
   fpsControllerScript: {fileID: 8616685848737228371}
   gunsScript: {fileID: 4463207039234104641}
-  gameManager: {fileID: 0}
 --- !u!1 &6558597798040027018
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,7 +447,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunStats: {fileID: 11400000, guid: 047fa2dec9fc9f9478812c2110494e71, type: 2}
   gunTransform: {fileID: 270310813793389721}
-  bulletTrailGo: {fileID: 0}
+  bulletTrailPrefab: {fileID: 4545883434879887161, guid: e399a04c2df9d4e4f8d36e5330b21768,
+    type: 3}
+  bulletPrefab: {fileID: 4545883434879887161, guid: e399a04c2df9d4e4f8d36e5330b21768,
+    type: 3}
   gunReloadBar: {fileID: 0}
   colorIntensity: 2
   throwSpeed: 0
@@ -750,7 +752,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2630765107
+  GlobalObjectIdHash: 169829396
   InScenePlacedSourceGlobalObjectIdHash: 2027524606
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

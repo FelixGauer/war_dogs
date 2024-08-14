@@ -18,7 +18,8 @@ public class Guns : NetworkBehaviour
     private Vector3 direction;
     private float x;
     private float y;
-    public GameObject bulletTrailPrefab;
+    // public GameObject bulletTrailPrefab;
+    public GameObject bulletPrefab;
     public Slider gunReloadBar;
     public float colorIntensity;
     public float throwSpeed;
@@ -36,7 +37,7 @@ public class Guns : NetworkBehaviour
     [Header("Graphics")]
     public GameObject bulletHoleGraphic;
     
-    private void Awake()
+   private void Awake()
     {
         fpsCam = Camera.main;
         gunReloadBar = GameObject.Find("ReloadSlider").GetComponent<Slider>();
@@ -81,11 +82,12 @@ public class Guns : NetworkBehaviour
     private void Shoot()
     {
         readyToShoot = false;
-        RaycastHit rayHit;
 
         x = Random.Range(-gunStats.spread, gunStats.spread);
         y = Random.Range(-gunStats.spread, gunStats.spread);
         direction = fpsCam.transform.forward + new Vector3(x, y, 0);
+
+        RaycastHit rayHit;
 
         if (Physics.Raycast(attackPoint.position, direction, out rayHit, gunStats.range, whatIsEnemy))
         {
@@ -95,14 +97,7 @@ public class Guns : NetworkBehaviour
             }
         }
 
-        if (IsServer)
-        {
-            SpawnBulletOrTrailServerRpc(attackPoint.position, Quaternion.LookRotation(direction));
-        }
-        else
-        {
-            SpawnBulletOrTrailClientRpc(attackPoint.position, Quaternion.LookRotation(direction));
-        }
+        RequestShootServerRpc(attackPoint.position, direction, rayHit.point, rayHit.collider != null);
 
         bulletsLeft--;
         bulletsShot--;
@@ -116,39 +111,27 @@ public class Guns : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void SpawnBulletOrTrailServerRpc(Vector3 position, Quaternion rotation)
+    private void RequestShootServerRpc(Vector3 attackPosition, Vector3 direction, Vector3 hitPoint, bool hitSomething)
     {
-        SpawnBulletOrTrail(position, rotation);
+        // The server handles spawning the bullet and bullet trail for all clients
+        SpawnBulletOrTrail(attackPosition, Quaternion.LookRotation(direction), hitPoint, hitSomething);
     }
 
-    [ClientRpc]
-    private void SpawnBulletOrTrailClientRpc(Vector3 position, Quaternion rotation)
+    private void SpawnBulletOrTrail(Vector3 position, Quaternion rotation, Vector3 hitPoint, bool hitSomething)
     {
-        SpawnBulletOrTrail(position, rotation);
-    }
-
-    private void SpawnBulletOrTrail(Vector3 position, Quaternion rotation)
-    {
-        if (gunStats.bulletObject)
+        if (bulletPrefab != null)
         {
-            bulletTrailPrefab = PoolManager.instance.GetPooledBulletObject();
-        }
-        else
-        {
-            bulletTrailPrefab = PoolManager.instance.GetPooledBulletsTrails();
-        }
-
-        if (bulletTrailPrefab != null)
-        {
-            bulletTrailPrefab.transform.position = position;
-            bulletTrailPrefab.transform.rotation = rotation;
-            bulletTrailPrefab.SetActive(true);
-
-            if (gunStats.bulletObject)
+            // Instantiate the bullet trail (renamed from bulletTrailPrefab to bulletPrefab)
+            GameObject trailInstance = Instantiate(bulletPrefab, position, rotation);
+            LineRenderer lineRenderer = trailInstance.GetComponent<LineRenderer>();
+            if (lineRenderer != null && hitSomething)
             {
-                rb = bulletTrailPrefab.GetComponent<Rigidbody>();
-                rb.velocity = attackPoint.forward * throwSpeed;
+                lineRenderer.SetPosition(0, position);
+                lineRenderer.SetPosition(1, hitPoint);
             }
+
+            // Spawn the bullet trail as a network object
+            trailInstance.GetComponent<NetworkObject>().Spawn();
         }
     }
 
@@ -166,7 +149,7 @@ public class Guns : NetworkBehaviour
         {
             gunReloadBar.value = Mathf.Lerp(0, gunStats.magazineSize, elapsedTime / gunStats.reloadTime);
             elapsedTime += Time.deltaTime;
-            yield return null; // Wait for the next frame
+            yield return null;
         }
 
         ReloadFinished();
