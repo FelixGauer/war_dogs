@@ -18,7 +18,7 @@ public class Guns : NetworkBehaviour
     private Vector3 direction;
     private float x;
     private float y;
-    public GameObject bulletTrailGo;
+    public GameObject bulletTrailPrefab;
     public Slider gunReloadBar;
     public float colorIntensity;
     public float throwSpeed;
@@ -38,17 +38,12 @@ public class Guns : NetworkBehaviour
     
     private void Awake()
     {
-        fpsCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        fpsCam = Camera.main;
         gunReloadBar = GameObject.Find("ReloadSlider").GetComponent<Slider>();
         bulletsLeft = gunStats.magazineSize;
         readyToShoot = true;
     }
-    
-    public bool IsLobbyCreated()
-    {
-        return NetworkManager.Singleton.IsServer;
-    }
-    
+
     private void Update()
     {
         if (!IsOwner)
@@ -56,125 +51,112 @@ public class Guns : NetworkBehaviour
             return;
         }
 
+        MyInput();
 
-        if (IsLobbyCreated())
-        {
-            MyInput();
+        direction = fpsCam.transform.forward + new Vector3(x, y, 0);
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        gunTransform.rotation = rotation;
 
-            //change this to gun
-            // direction = fpsCam.transform.forward + new Vector3(x, y, 0);
-            direction = fpsCam.transform.forward + new Vector3(x, y, 0);
-
-            Quaternion rotation = Quaternion.LookRotation(direction);
-            gunTransform.rotation = rotation;
-
-            gunReloadBar.maxValue = gunStats.magazineSize;
-            gunReloadBar.value = bulletsLeft;
-        }
+        gunReloadBar.maxValue = gunStats.magazineSize;
+        gunReloadBar.value = bulletsLeft;
     }
-    
-    
+
     private void MyInput()
     {
-        if (gunStats.allowButtonHold) shooting = Input.GetKey(KeyCode.Mouse0);
-        else shooting = Input.GetKeyDown(KeyCode.Mouse0);
+        shooting = gunStats.allowButtonHold ? Input.GetKey(KeyCode.Mouse0) : Input.GetKeyDown(KeyCode.Mouse0);
 
         if (Input.GetKeyDown(KeyCode.R) && bulletsLeft < gunStats.magazineSize && !reloading)
         {
+            Debug.Log("Reload started by player " + NetworkManager.Singleton.LocalClientId);
             StartCoroutine(Reload());
         }
 
-        
-        //Shoot
-        if (readyToShoot && shooting && !reloading && bulletsLeft > 0){
+        if (readyToShoot && shooting && !reloading && bulletsLeft > 0)
+        {
             bulletsShot = gunStats.bulletsPerTap;
             Shoot();
         }
     }
-    
+
     private void Shoot()
     {
         readyToShoot = false;
         RaycastHit rayHit;
 
-        //Spread
         x = Random.Range(-gunStats.spread, gunStats.spread);
-        y = Random.Range(gunStats.spread, gunStats.spread);
-
-        //Calculate Direction with Spread
+        y = Random.Range(-gunStats.spread, gunStats.spread);
         direction = fpsCam.transform.forward + new Vector3(x, y, 0);
 
-        //RayCast
-        if (Physics.Raycast(attackPoint.transform.position, direction, out rayHit, gunStats.range, whatIsEnemy))
-        {    
-
+        if (Physics.Raycast(attackPoint.position, direction, out rayHit, gunStats.range, whatIsEnemy))
+        {
             if (rayHit.collider.CompareTag("Enemy"))
             {
                 rayHit.collider.GetComponent<EnemyAi>().TakeDamage(gunStats.damage);
             }
         }
 
-        //TODO: ShakeCamera
-
-        if (gunStats.bulletObject)
+        if (IsServer)
         {
-            Debug.Log("11");
-            bulletTrailGo = PoolManager.instance.GetPooledBulletObject();
+            SpawnBulletOrTrailServerRpc(attackPoint.position, Quaternion.LookRotation(direction));
         }
         else
         {
-            bulletTrailGo = PoolManager.instance.GetPooledBulletsTrails();
+            SpawnBulletOrTrailClientRpc(attackPoint.position, Quaternion.LookRotation(direction));
         }
-        
-        // Using Gradiant
-         // ParticleSystem.MainModule bulletTrailParticle = bulletTrailGo.GetComponent<ParticleSystem>().main;
-         // bulletTrailParticle.startColor = new ParticleSystem.MinMaxGradient(gunStats.minColor, gunStats.maxColor);
-
-         
-         //TODO move this to when switching weapons
-        Material material = gunStats.material;
-        material.SetColor("_EmissionColor", gunStats.emissionColor * colorIntensity);
-        
-        
-        if (bulletTrailGo != null && !gunStats.bulletObject)
-        {
-            bulletTrailGo.transform.position = attackPoint.position;
-            bulletTrailGo.transform.rotation = attackPoint.rotation;
-            bulletTrailGo.SetActive(true);
-            
-        }
-        else
-        {
-            bulletTrailGo.transform.position = attackPoint.position;
-            bulletTrailGo.transform.rotation = attackPoint.rotation;
-            rb = bulletTrailGo.GetComponent<Rigidbody>();
-            rb.velocity = attackPoint.forward * throwSpeed;
-            bulletTrailGo.SetActive(true);
-        }
-        
-        if (bulletTrailGo != null)
-        {
-            bulletTrailGo.transform.position = attackPoint.position;
-            bulletTrailGo.transform.rotation = Quaternion.LookRotation(direction); // Set the rotation to match the direction
-            bulletTrailGo.SetActive(true);
-        }
-        
-        //Graphics
-        // Instantiate(bulletHoleGraphic, rayHit.point, Quaternion.Euler(0, 180, 0));
-        // Instantiate(muzzleFlash, attackPoint.position, attackPoint.rotation);
 
         bulletsLeft--;
         bulletsShot--;
 
         Invoke("ResetShot", gunStats.fireRate);
-        
-        if(bulletsShot > 0 && bulletsLeft > 0)
-        Invoke("Shoot", gunStats.fireRate);
+
+        if (bulletsShot > 0 && bulletsLeft > 0)
+        {
+            Invoke("Shoot", gunStats.fireRate);
+        }
     }
+
+    [ServerRpc]
+    private void SpawnBulletOrTrailServerRpc(Vector3 position, Quaternion rotation)
+    {
+        SpawnBulletOrTrail(position, rotation);
+    }
+
+    [ClientRpc]
+    private void SpawnBulletOrTrailClientRpc(Vector3 position, Quaternion rotation)
+    {
+        SpawnBulletOrTrail(position, rotation);
+    }
+
+    private void SpawnBulletOrTrail(Vector3 position, Quaternion rotation)
+    {
+        if (gunStats.bulletObject)
+        {
+            bulletTrailPrefab = PoolManager.instance.GetPooledBulletObject();
+        }
+        else
+        {
+            bulletTrailPrefab = PoolManager.instance.GetPooledBulletsTrails();
+        }
+
+        if (bulletTrailPrefab != null)
+        {
+            bulletTrailPrefab.transform.position = position;
+            bulletTrailPrefab.transform.rotation = rotation;
+            bulletTrailPrefab.SetActive(true);
+
+            if (gunStats.bulletObject)
+            {
+                rb = bulletTrailPrefab.GetComponent<Rigidbody>();
+                rb.velocity = attackPoint.forward * throwSpeed;
+            }
+        }
+    }
+
     private void ResetShot()
     {
         readyToShoot = true;
     }
+
     private IEnumerator Reload()
     {
         reloading = true;
@@ -189,20 +171,19 @@ public class Guns : NetworkBehaviour
 
         ReloadFinished();
     }
+
     private void ReloadFinished()
     {
         bulletsLeft = gunStats.magazineSize;
         reloading = false;
     }
-    
-    
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.black;
-        // Draw the raycast gizmo
-        Gizmos.color = Color.red; // Set color for gizmo
-        Vector3 startPos = fpsCam.transform.position; // Start position of the raycast
-        Vector3 direction = fpsCam.transform.forward; // Direction of the raycast
-        Gizmos.DrawLine(startPos, startPos + direction * gunStats.range); // Draw the raycast as a line
+        Gizmos.color = Color.red;
+        Vector3 startPos = fpsCam.transform.position;
+        Vector3 direction = fpsCam.transform.forward;
+        Gizmos.DrawLine(startPos, startPos + direction * gunStats.range);
     }
 }

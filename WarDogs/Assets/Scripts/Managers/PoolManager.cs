@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PoolManager : MonoBehaviour
+public class PoolManager : NetworkBehaviour
 {
     public static PoolManager instance;
     
@@ -44,20 +44,19 @@ public class PoolManager : MonoBehaviour
             yield return null;
         }
         
-        BulletTrailPooling();
-
-        BulletObjectPooling();
-        
-        EnemyBulletObjectPooling();
-        
-        EnemyPooling();
+        if (IsServer)
+        {
+            BulletTrailPooling();
+            BulletObjectPooling();
+            EnemyBulletObjectPooling();
+            EnemyPooling();
+        }
     }
 
-    #region Bullet Trail Pooling
-    
+     #region Bullet Trail Pooling
+
     public GameObject GetPooledBulletsTrails()
     {
-        
         for (int i = 0; i < bulletTrainAmount; i++)
         {
             if (!bulletTrailPool[i].activeInHierarchy)
@@ -66,14 +65,18 @@ public class PoolManager : MonoBehaviour
             }
         }
 
-        GameObject tmp;
-        tmp = Instantiate(bulletTrailPrefab);
-        tmp.GetComponent<NetworkObject>().Spawn(true);
-        tmp.transform.SetParent(bulletTrailContainer.transform);
-        bulletTrailPool.Add(tmp);
-        bulletTrainAmount++;
+        GameObject tmp = null;
+        if (IsServer)
+        {
+            tmp = Instantiate(bulletTrailPrefab);
+            tmp.GetComponent<NetworkObject>().Spawn(true);
+            tmp.transform.SetParent(bulletTrailContainer.transform);
+            bulletTrailPool.Add(tmp);
+            bulletTrainAmount++;
+        }
         return tmp;
     }
+
     private void BulletTrailPooling()
     {
         bulletTrailPool = new List<GameObject>();
@@ -87,10 +90,11 @@ public class PoolManager : MonoBehaviour
             bulletTrailPool.Add(tmp);
         }
     }
+
     #endregion
-    
+
     #region Bullet Object Pooling
-    
+
     public GameObject GetPooledBulletObject()
     {
         for (int i = 0; i < bulletObjectAmount; i++)
@@ -101,14 +105,18 @@ public class PoolManager : MonoBehaviour
             }
         }
 
-        GameObject tmp;
-        tmp = Instantiate(bulletObjectPrefab);
-        tmp.GetComponent<NetworkObject>().Spawn(true);
-        tmp.transform.SetParent(bulletObjectContainer.transform);
-        bulletObjectPool.Add(tmp);
-        bulletObjectAmount++;
+        GameObject tmp = null;
+        if (IsServer)
+        {
+            tmp = Instantiate(bulletObjectPrefab);
+            tmp.GetComponent<NetworkObject>().Spawn(true);
+            tmp.transform.SetParent(bulletObjectContainer.transform);
+            bulletObjectPool.Add(tmp);
+            bulletObjectAmount++;
+        }
         return tmp;
     }
+
     private void BulletObjectPooling()
     {
         bulletObjectPool = new List<GameObject>();
@@ -122,10 +130,11 @@ public class PoolManager : MonoBehaviour
             bulletObjectPool.Add(tmp);
         }
     }
+
     #endregion
-    
+
     #region Enemy Bullet Object Pooling
-    
+
     public GameObject GetPooledEnemyBulletObject()
     {
         for (int i = 0; i < enemyBulletObjectAmount; i++)
@@ -136,14 +145,18 @@ public class PoolManager : MonoBehaviour
             }
         }
 
-        GameObject tmp;
-        tmp = Instantiate(enemyBulletObjectPrefab);
-        tmp.GetComponent<NetworkObject>().Spawn(true);
-        tmp.transform.SetParent(enemyBulletObjectContainer.transform);
-        enemyBulletObjectPool.Add(tmp);
-        enemyBulletObjectAmount++;
+        GameObject tmp = null;
+        if (IsServer)
+        {
+            tmp = Instantiate(enemyBulletObjectPrefab);
+            tmp.GetComponent<NetworkObject>().Spawn(true);
+            tmp.transform.SetParent(enemyBulletObjectContainer.transform);
+            enemyBulletObjectPool.Add(tmp);
+            enemyBulletObjectAmount++;
+        }
         return tmp;
     }
+
     private void EnemyBulletObjectPooling()
     {
         enemyBulletObjectPool = new List<GameObject>();
@@ -157,8 +170,9 @@ public class PoolManager : MonoBehaviour
             enemyBulletObjectPool.Add(tmp);
         }
     }
+
     #endregion
-    
+
     #region Enemy
 
     public GameObject GetPooledEnemy()
@@ -171,14 +185,18 @@ public class PoolManager : MonoBehaviour
             }
         }
 
-        GameObject tmp;
-        tmp = Instantiate(enemyPrefab);
-        tmp.GetComponent<NetworkObject>().Spawn(true);
-        tmp.transform.SetParent(enemyContainer.transform); 
-        enemyPool.Add(tmp);
-        enemyAmount++;
+        GameObject tmp = null;
+        if (IsServer)
+        {
+            tmp = Instantiate(enemyPrefab);
+            tmp.GetComponent<NetworkObject>().Spawn(true);
+            tmp.transform.SetParent(enemyContainer.transform);
+            enemyPool.Add(tmp);
+            enemyAmount++;
+        }
         return tmp;
     }
+
     private void EnemyPooling()
     {
         enemyPool = new List<GameObject>();
@@ -192,5 +210,6 @@ public class PoolManager : MonoBehaviour
             enemyPool.Add(tmp);
         }
     }
+
     #endregion
 }

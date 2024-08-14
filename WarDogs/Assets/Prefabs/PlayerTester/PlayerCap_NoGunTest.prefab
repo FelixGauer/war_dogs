@@ -43,7 +43,6 @@ GameObject:
   - component: {fileID: 3319646941308195648}
   - component: {fileID: 3319646941308195649}
   - component: {fileID: 1462478681067848828}
-  - component: {fileID: 7390395443171376173}
   m_Layer: 7
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -169,25 +168,6 @@ MonoBehaviour:
     mipBias: 0
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
---- !u!114 &7390395443171376173
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3319646941308195650}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cef54bd0e47716c48bbf52a79f025180, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerBody: {fileID: 3613732250680398486}
-  mouseSensitivity: 3.5
-  walkSpeed: 6
-  gravity: -13
-  moveSmoothTime: 0.3
-  mouseSmoothTime: 0.03
-  lockCursor: 1
 --- !u!1 &4603322618011147148
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,7 +367,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1894619634
+  GlobalObjectIdHash: 3329642787
   InScenePlacedSourceGlobalObjectIdHash: 3896701367
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -722,4 +702,3 @@ MonoBehaviour:
   isDead: 0
   fpsControllerScript: {fileID: 5810130220921579498}
   gunsScript: {fileID: 0}
-  gameManager: {fileID: 0}

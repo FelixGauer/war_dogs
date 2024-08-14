@@ -16,7 +16,7 @@ public class TestRelay : MonoBehaviour
 {
     [SerializeField] private TMP_InputField joinLobbyCode;
     public int maxPlayer;
-    
+    public TextMeshProUGUI joinCodeText;
     private async void Start()
     {
        await UnityServices.InitializeAsync();
@@ -40,6 +40,7 @@ public class TestRelay : MonoBehaviour
             //This string is used to connect to friends
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
             
+            joinCodeText.text = joinCode;
             Debug.Log(joinCode);
 
             RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
