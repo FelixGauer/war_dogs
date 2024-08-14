@@ -52,8 +52,8 @@ public class PoolManager : NetworkBehaviour
             EnemyPooling();
         }
     }
-
-     #region Bullet Trail Pooling
+    
+    #region Bullet Trail Pooling
 
     public GameObject GetPooledBulletsTrails()
     {
@@ -61,6 +61,11 @@ public class PoolManager : NetworkBehaviour
         {
             if (!bulletTrailPool[i].activeInHierarchy)
             {
+                bulletTrailPool[i].SetActive(true);
+                if (IsServer)
+                {
+                    NotifyClientsToActivateObjectClientRpc(bulletTrailPool[i].GetComponent<NetworkObject>().NetworkObjectId);
+                }
                 return bulletTrailPool[i];
             }
         }
@@ -89,6 +94,13 @@ public class PoolManager : NetworkBehaviour
             tmp.SetActive(false);
             bulletTrailPool.Add(tmp);
         }
+    }
+    
+    [ClientRpc]
+    private void NotifyClientsToActivateObjectClientRpc(ulong objectId)
+    {
+        var obj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectId].gameObject;
+        obj.SetActive(true);
     }
 
     #endregion
@@ -181,6 +193,11 @@ public class PoolManager : NetworkBehaviour
         {
             if (!enemyPool[i].activeInHierarchy)
             {
+                enemyPool[i].SetActive(true);
+                if (IsServer)
+                {
+                    NotifyClientsToActivateEnemyClientRpc(enemyPool[i].GetComponent<NetworkObject>().NetworkObjectId);
+                }
                 return enemyPool[i];
             }
         }
@@ -209,6 +226,13 @@ public class PoolManager : NetworkBehaviour
             tmp.SetActive(false);
             enemyPool.Add(tmp);
         }
+    }
+    
+    [ClientRpc]
+    private void NotifyClientsToActivateEnemyClientRpc(ulong objectId)
+    {
+        var obj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectId].gameObject;
+        obj.SetActive(true);
     }
 
     #endregion

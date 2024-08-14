@@ -1,18 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-public class EnemyAi : MonoBehaviour
+public class EnemyAi : NetworkBehaviour
 {
     //Increase speed of some enemies on chse state using navmesh agent component 
     
     [Header("General")]
     public EnemyAIScriptableObject enemyType;
     public NavMeshAgent agent;
-    public float baseOffset;
+    public float baseOffset; //Change it to 4 once camera works perfectly
     public Transform player;
     public List<Transform> targets;
     private PlayerStats playerStats;
@@ -41,7 +42,7 @@ public class EnemyAi : MonoBehaviour
     public float bossHealthThreshold = 0.5f;
     
     [Header("ScriptableObject References")] 
-    public float health;
+    private NetworkVariable<float> networkHealth = new NetworkVariable<float>();
     private float damage;
     private float sightRange;
     private float attackRange;
@@ -70,32 +71,36 @@ public class EnemyAi : MonoBehaviour
         {
             targets.Add(partObject.transform);
         }
-        
-        
+
         if (targets.Count > 0)
         {
             player = targets[Random.Range(0, targets.Count)];
         }
-        
+
         if (player != null && player.gameObject.CompareTag("Player"))
         {
             playerStats = player.GetComponentInChildren<PlayerStats>();
         }
-        
+
         agent = GetComponent<NavMeshAgent>();
         audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
     {
-        health = enemyType.health;
+        if (IsServer)
+        {
+            // Initialize Network Variables on the server
+            networkHealth.Value = enemyType.health;
+        }
+
         damage = enemyType.damage;
         sightRange = enemyType.sightRange;
         attackRange = enemyType.attackRange;
         speed = enemyType.speed;
         increaseSpeedOnGettingAttacked = enemyType.increaseSightOnGettingAttacked;
         agent.speed = speed;
-        
+
         if (!enemyType.isGroundEnemy)
         {
             agent.agentTypeID = -1372625422; //Flying Enemy ID found from Inspector Debug
@@ -105,7 +110,9 @@ public class EnemyAi : MonoBehaviour
 
     private void Update()
     {
-        //dodge
+        Debug.Log(this.gameObject.name + "  " + networkHealth.Value);
+        
+        // Dodge
         dodgeTimer += Time.deltaTime;
         if (isDodging)
         {
@@ -115,7 +122,7 @@ public class EnemyAi : MonoBehaviour
                 isDodging = false;
             }
         }
-        
+
         Collider[] collidersInSightRange = Physics.OverlapSphere(transform.position, sightRange);
         Collider[] collidersInAttackRange = Physics.OverlapSphere(transform.position, attackRange);
 
@@ -142,7 +149,7 @@ public class EnemyAi : MonoBehaviour
                 }
             }
         }
-        
+
         if (!playerInSightRange && !playerInAttackRange)
         {
             ChasePlayer();
@@ -150,7 +157,7 @@ public class EnemyAi : MonoBehaviour
 
         if (player.CompareTag("Player"))
         {
-            if(playerStats != null && playerStats.isDead)
+            if (playerStats != null && playerStats.isDead)
             {
                 ChasePlayer();
             }
@@ -160,22 +167,22 @@ public class EnemyAi : MonoBehaviour
         {
             ChasePlayer();
         }
-        
+
         if (playerInAttackRange && playerInSightRange)
         {
             AttackPlayer();
         }
-        
+
         EnemyTypeCondition();
     }
-    
+
     private void ChasePlayer()
     {
         if (playerStats != null && playerStats.isDead)
         {
             playerInSightRange = false;
             playerInAttackRange = false;
-            
+
             for (int i = targets.Count - 1; i >= 0; i--)
             {
                 PlayerStats otherPlayerStats = targets[i].GetComponentInChildren<PlayerStats>();
@@ -192,7 +199,7 @@ public class EnemyAi : MonoBehaviour
         {
             playerInSightRange = false;
             playerInAttackRange = false;
-            
+
             isActive = false;
             while (!isActive)
             {
@@ -219,8 +226,8 @@ public class EnemyAi : MonoBehaviour
 
         if (!alreadyAttacked)
         {
-            // AttackCode
-            
+            // Attack Code
+
             enemyBulletGo = PoolManager.instance.GetPooledEnemyBulletObject();
             if (enemyBulletGo != null)
             {
@@ -232,8 +239,8 @@ public class EnemyAi : MonoBehaviour
             Rigidbody rb = enemyBulletGo.GetComponent<Rigidbody>();
             enemyBulletGo.transform.position = firePoint.transform.position;
             Vector3 throwDirection = (player.position - firePoint.transform.position).normalized;
-            rb.AddForce(throwDirection * enemyType.throwSpeed, ForceMode.Impulse); 
-            
+            rb.AddForce(throwDirection * enemyType.throwSpeed, ForceMode.Impulse);
+
             RaycastHit hit;
             if (Physics.Raycast(firePoint.transform.position, throwDirection, out hit, sightRange))
             {
@@ -242,7 +249,7 @@ public class EnemyAi : MonoBehaviour
                     hit.collider.GetComponent<PlayerStats>().health -= damage;
                     audioSource.PlayOneShot(hitAudio, 0.75f);
                 }
-                
+
                 if (hit.collider.CompareTag("PermanentPart"))
                 {
                     hit.collider.GetComponent<PermanentPartsHandler>().health -= damage;
@@ -255,7 +262,7 @@ public class EnemyAi : MonoBehaviour
                     }
                 }
             }
-            
+
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), enemyType.timeBetweenAttacks);
         }
@@ -265,16 +272,23 @@ public class EnemyAi : MonoBehaviour
     {
         alreadyAttacked = false;
     }
-
+    
     public void TakeDamage(int damage)
     {
-        //Increase stats on getting attacked
-        sightRange = sightRange + enemyType.increaseSightOnGettingAttacked;
-        speed = speed + increaseSpeedOnGettingAttacked;
-        
-        health -= damage;
+        // Call server RPC to update health
+        TakeDamageServerRpc(damage);
+    }
 
-        if (health > 0 && dodgeTimer >= dodgeCooldown)
+    [ServerRpc]
+    public void TakeDamageServerRpc(float damage)
+    {
+        // Increase stats on getting attacked
+        // networkHealth.Value += enemyType.increaseSightOnGettingAttacked;
+        speed += increaseSpeedOnGettingAttacked;
+
+        networkHealth.Value -= damage;
+
+        if (networkHealth.Value > 0 && dodgeTimer >= dodgeCooldown)
         {
             // Dodge the next attack
             int dodgeDirection = (Random.Range(0, 2) * 2 - 1) * 2; // Generates either -2 or 2
@@ -284,14 +298,15 @@ public class EnemyAi : MonoBehaviour
             isDodging = true;
             dodgeTimer = 0f;
         }
-        
-        if(health <= 0)
+
+        if (networkHealth.Value <= 0)
         {
-            Invoke(nameof(DestroyEnemy), 0.5f);
+            DestroyEnemyClientRpc();
         }
     }
 
-    private void DestroyEnemy()
+    [ClientRpc]
+    private void DestroyEnemyClientRpc()
     {
         Debug.Log("Dead");
         WaveSpawner.instance.enemiesAlive--;
@@ -300,30 +315,30 @@ public class EnemyAi : MonoBehaviour
 
     private void EnemyTypeCondition()
     {
-        //check for boss type enemy
+        // Check for boss type enemy
         if (enemyType.isBossEnemy)
-        { 
+        {
             bool hasIncreasedSpeed = false;
             bool hasIncreasedTransform = false;
-            
-            //Remove this once models are impliemented
+
+            // Remove this once models are implemented
             if (!hasIncreasedTransform)
             {
                 transform.localScale = new Vector3(3, 3, 3);
                 hasIncreasedTransform = true;
             }
-            
+
             Debug.Log("Boss Enemy");
             float healthThreshold = enemyType.health * bossHealthThreshold;
 
-            if (health <= healthThreshold && !hasIncreasedSpeed)
+            if (networkHealth.Value <= healthThreshold && !hasIncreasedSpeed)
             {
                 agent.speed += increaseBossSpeed;
                 Debug.Log(agent.speed + " " + increaseBossSpeed);
                 hasIncreasedSpeed = true;
             }
-        } 
-        
+        }
+
         bool hasChangedMaterial = false;
         if (!hasChangedMaterial)
         {
@@ -341,7 +356,7 @@ public class EnemyAi : MonoBehaviour
             hasChangedMaterial = true;
         }
     }
-    
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

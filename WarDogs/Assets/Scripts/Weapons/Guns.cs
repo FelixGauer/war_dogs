@@ -11,7 +11,6 @@ public class Guns : NetworkBehaviour
     [Header("Gun Stats scriptable object")]
     public GunsScriptableObjects gunStats;
     
-    //Gun stats
     [Header("Guns General Stats")]
     private int bulletsLeft, bulletsShot;
     public Transform gunTransform;
@@ -91,6 +90,8 @@ public class Guns : NetworkBehaviour
 
         if (Physics.Raycast(attackPoint.position, direction, out rayHit, gunStats.range, whatIsEnemy))
         {
+            Debug.Log(rayHit.collider.name + " was hit!");
+            
             if (rayHit.collider.CompareTag("Enemy"))
             {
                 rayHit.collider.GetComponent<EnemyAi>().TakeDamage(gunStats.damage);
@@ -113,25 +114,22 @@ public class Guns : NetworkBehaviour
     [ServerRpc]
     private void RequestShootServerRpc(Vector3 attackPosition, Vector3 direction, Vector3 hitPoint, bool hitSomething)
     {
-        // The server handles spawning the bullet and bullet trail for all clients
-        SpawnBulletOrTrail(attackPosition, Quaternion.LookRotation(direction), hitPoint, hitSomething);
-    }
-
-    private void SpawnBulletOrTrail(Vector3 position, Quaternion rotation, Vector3 hitPoint, bool hitSomething)
-    {
-        if (bulletPrefab != null)
+        //GameObject trailInstance = Instantiate(bulletPrefab, position, rotation);
+        
+        GameObject trailInstance = PoolManager.instance.GetPooledBulletsTrails();
+    
+        if (trailInstance != null)
         {
-            // Instantiate the bullet trail (renamed from bulletTrailPrefab to bulletPrefab)
-            GameObject trailInstance = Instantiate(bulletPrefab, position, rotation);
-            LineRenderer lineRenderer = trailInstance.GetComponent<LineRenderer>();
-            if (lineRenderer != null && hitSomething)
-            {
-                lineRenderer.SetPosition(0, position);
-                lineRenderer.SetPosition(1, hitPoint);
-            }
+            NetworkObject networkObject = trailInstance.GetComponent<NetworkObject>();
 
-            // Spawn the bullet trail as a network object
-            trailInstance.GetComponent<NetworkObject>().Spawn();
+        
+            if (!networkObject.IsSpawned)
+            {
+                networkObject.Spawn();
+            }
+        
+            trailInstance.transform.position = attackPosition;
+            trailInstance.transform.rotation = Quaternion.LookRotation(direction);
         }
     }
 

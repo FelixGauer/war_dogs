@@ -24,7 +24,6 @@ public class PauseMenu : MonoBehaviour
             Debug.Log("Escape pressed");
             isPaused = !isPaused;
             pauseMenu.SetActive(isPaused);
-            Time.timeScale = isPaused ? 0f : 1f;
         }
         
         if (isPaused)
@@ -37,13 +36,6 @@ public class PauseMenu : MonoBehaviour
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
-    }
-
-    public void Resume()
-    {
-        isPaused = false;
-        pauseMenu.SetActive(isPaused);
-        Time.timeScale = 1f;
     }
     
     public void RestartLevel()
