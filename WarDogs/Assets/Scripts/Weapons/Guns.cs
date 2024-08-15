@@ -67,7 +67,6 @@ public class Guns : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.R) && bulletsLeft < gunStats.magazineSize && !reloading)
         {
-            Debug.Log("Reload started by player " + NetworkManager.Singleton.LocalClientId);
             StartCoroutine(Reload());
         }
 
@@ -116,20 +115,16 @@ public class Guns : NetworkBehaviour
     {
         //GameObject trailInstance = Instantiate(bulletPrefab, position, rotation);
         
-        GameObject trailInstance = PoolManager.instance.GetPooledBulletsTrails();
-    
+        GameObject trailInstance = Instantiate(bulletPrefab, attackPosition, Quaternion.LookRotation(direction));
+
         if (trailInstance != null)
         {
             NetworkObject networkObject = trailInstance.GetComponent<NetworkObject>();
-
-        
-            if (!networkObject.IsSpawned)
+    
+            if (IsServer)
             {
                 networkObject.Spawn();
             }
-        
-            trailInstance.transform.position = attackPosition;
-            trailInstance.transform.rotation = Quaternion.LookRotation(direction);
         }
     }
 

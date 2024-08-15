@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using System.Linq;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class WaveSpawner : MonoBehaviour
+public class WaveSpawner : NetworkBehaviour
 {
     public static WaveSpawner instance;
     
@@ -105,38 +106,36 @@ public class WaveSpawner : MonoBehaviour
         maxEnemies = maxEnemies + additionalMaxEnemies;
         enemiesToSpawn = ((minEnemies + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches)) - enemiesAlive);
 
-        //I'm thinking the biggest problem is how the brakets are facorized. Instead I'm thinking: (Added " --- DONE" to the ones that I think are done)
-        //- large inital addition to min enemies (can be done already) --- DONE
-        //- the system should take into account how many enemies are still left --- DONE, enemiesAlive
-        //- additional breaches and waev progression should work additively (which it does). Keeping this is a factor is still smart, if we want to ge below 1
-        //- use maxenemies as the hardcap for performance reasons so no + additionalmaxenemies -- Remove maxEnemies += additionalMaxEnemies to hard cap 
-        //- add another variable instead, let's call it optimalEnemies --- DONE (added in current statement only)
-        //  optimalEnemies = min + (wave * additionalEnemiesPerWave) + (activeSpawnPoints.Count * additionalEnemiesPerBreaches) --- DONE
-        //- enemiestospawn = (optimalEnemies - enemiesstillleft) * additional factor of >1 so there is always a dynamic spawn rate --- Cannot multiply with 0.75f, we are working with int
-
         if (enemiesToSpawn >= maxEnemies) 
         {
             enemiesToSpawn = maxEnemies;
         }
-        
+    
         for (int i = 0; i < numberOfEnemies; i++)
         {
-            enemyGo = PoolManager.instance.GetPooledEnemy();
-            if(enemyGo != null && activeSpawnPoints.Count > 0) {
-
+            if (activeSpawnPoints.Count > 0) 
+            {
                 if (randomiseSpawn)
                 {
                     enemyType = enemyAiScriptable[Random.Range(0, totalEnemyTypes)];
                 }
 
-                enemyGo.GetComponent<EnemyAi>().enemyType = enemyType;
-
                 spawnPoint = activeSpawnPoints[Random.Range(0, activeSpawnPoints.Count)];
 
-                enemyGo.transform.position = spawnPoint.transform.position;
-                enemyGo.transform.rotation = spawnPoint.transform.rotation;
-                enemyGo.SetActive(true);
-                enemiesAlive++;
+                if (IsServer)
+                {
+                    GameObject enemyInstance = Instantiate(enemyPrefab, spawnPoint.transform.position, spawnPoint.transform.rotation);
+
+                    NetworkObject networkObject = enemyInstance.GetComponent<NetworkObject>();
+                    if (networkObject != null)
+                    {
+                        networkObject.Spawn();
+                    }
+
+                    enemyInstance.GetComponent<EnemyAi>().enemyType = enemyType;
+
+                    enemiesAlive++;
+                }
             }
         }
     }

@@ -371,7 +371,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyType: {fileID: 11400000, guid: 5e5e7ad6347f35646af7df934145e64e, type: 2}
   agent: {fileID: 1401839599183363187}
-  baseOffset: 0
+  baseOffset: 1
   player: {fileID: 5365462296395314267}
   targets: []
   enemyBulletGo: {fileID: 0}

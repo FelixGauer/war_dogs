@@ -284,7 +284,7 @@ public class EnemyAi : NetworkBehaviour
     {
         // Increase stats on getting attacked
         // networkHealth.Value += enemyType.increaseSightOnGettingAttacked;
-        speed += increaseSpeedOnGettingAttacked;
+        // speed += increaseSpeedOnGettingAttacked;
 
         networkHealth.Value -= damage;
 
